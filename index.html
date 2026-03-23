@@ -590,17 +590,22 @@ const SERVICES = [
   {
     id: 'ghl', name: 'GoHighLevel CRM', section: 'Lead Nurturing',
     description: 'CRM + workflow engine - GHL Marketplace app', icon: '\uD83D\uDCCB',
-    url: 'https://services.leadconnectorhq.com', healthEndpoint: '',
-    configurable: false, needsApiKey: 'GHL_API_KEY',
-    status: 'config-needed',
-    actions: []
+    url: 'https://services.leadconnectorhq.com', healthEndpoint: '/locations/LjgmqjZskwMKTIcGOnvM',
+    configurable: false, needsApiKey: 'GHL_API_KEY', authBearer: true,
+    extraHeaders: { 'Version': '2021-07-28' },
+    actions: [
+      { label: 'Test Contacts API', method: 'GET', path: '/contacts/?locationId=LjgmqjZskwMKTIcGOnvM&limit=1' }
+    ]
   },
   {
     id: 'twilio', name: 'Twilio', section: 'Lead Nurturing',
-    description: 'SMS + WhatsApp delivery (~$0.015/msg)', icon: '\uD83D\uDCF1',
-    url: '', healthEndpoint: '',
-    configurable: false, status: 'config-needed',
-    actions: []
+    description: 'SMS + Voice via VAPI (~$0.015/msg)', icon: '\uD83D\uDCF1',
+    url: 'https://api.vapi.ai', healthEndpoint: '/phone-number/37fd52ef-5345-400b-8471-e01f4ff839d0',
+    extraHeaders: { 'Authorization': 'Bearer 1d227d93-e1de-43cb-af69-ef2d0ff67ed5' },
+    configurable: true,
+    actions: [
+      { label: 'List Calls', method: 'GET', path: '/call?limit=5' }
+    ]
   },
   {
     id: 'make', name: 'Make (Workflows)', section: 'Lead Nurturing',
@@ -1121,6 +1126,9 @@ function buildHeaders(svc) {
         headers['apikey'] = key;
       }
     }
+  }
+  if (svc.extraHeaders) {
+    Object.assign(headers, svc.extraHeaders);
   }
   return headers;
 }
