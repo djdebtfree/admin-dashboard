@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Driver Pro — Admin Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #000000;
+  --text: #FFFFFF;
+  --text-muted: #AAAAAA;
+  --accent-blue: #007BFF;
+  --accent-yellow: #F5FF00;
+  --gradient: linear-gradient(135deg, #007BFF, #F5FF00);
+  --healthy: #00FF88;
+  --unhealthy: #FF4444;
+  --unknown: #666666;
+  --not-deployed: #FF8800;
+  --planned: #9966FF;
+  --config-needed: #FFAA00;
+  --card-bg: #111111;
+  --card-border: #222222;
+  --card-hover: #1a1a1a;
+  --font: 'Montserrat', sans-serif;
+}
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ===== HEADER ===== */
+.header {
+  padding: 20px 30px;
+  border-bottom: 1px solid var(--card-border);
+  position: sticky;
+  top: 0;
+  background: rgba(0,0,0,0.95);
+  backdrop-filter: blur(10px);
+  z-index: 100;
+}
+
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.header-title {
+  font-size: 22px;
+  font-weight: 800;
+  background: var(--gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.5px;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-status {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.header-status span { font-weight: 700; color: var(--text); }
+
+.btn {
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  background: var(--card-bg);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn:hover { border-color: var(--accent-blue); background: #1a1a2a; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn.active { border-color: var(--accent-blue); background: rgba(0,123,255,0.15); color: var(--accent-blue); }
+.btn-action {
+  font-family: var(--font);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border: 1px solid var(--card-border);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--accent-blue);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-action:hover { background: rgba(0,123,255,0.1); border-color: var(--accent-blue); }
+.btn-action:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-action.running { color: var(--accent-yellow); border-color: var(--accent-yellow); }
+
+/* ===== PROGRESS BAR ===== */
+.progress-bar-wrap {
+  margin-top: 12px;
+  height: 4px;
+  background: var(--card-border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.progress-bar-fill {
+  height: 100%;
+  background: var(--gradient);
+  border-radius: 2px;
+  transition: width 0.5s ease;
+  width: 0%;
+}
+
+/* ===== MAIN ===== */
+.main {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px 30px;
+}
+
+/* ===== SECTION ===== */
+.section {
+  margin-bottom: 28px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.section-toggle {
+  font-size: 12px;
+  color: var(--accent-blue);
+  transition: transform 0.2s;
+}
+.section-header.collapsed .section-toggle { transform: rotate(-90deg); }
+
+.section-title {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+}
+
+.section-count {
+  font-size: 11px;
+  color: var(--unknown);
+  font-weight: 500;
+}
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+}
+.section-header.collapsed + .section-grid { display: none; }
+
+/* ===== SERVICE CARD ===== */
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  padding: 16px;
+  transition: border-color 0.2s, background 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.card:hover { border-color: #333; background: var(--card-hover); }
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--unknown);
+  transition: background 0.3s;
+}
+.card.healthy::before { background: var(--healthy); }
+.card.unhealthy::before { background: var(--unhealthy); }
+.card.not-deployed::before { background: var(--not-deployed); }
+.card.planned::before { background: var(--planned); }
+.card.config-needed::before { background: var(--config-needed); }
+
+.card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.card-icon-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-icon { font-size: 20px; }
+.card-name { font-size: 14px; font-weight: 700; line-height: 1.2; }
+.card-desc { font-size: 11px; color: var(--text-muted); margin-bottom: 10px; line-height: 1.4; }
+
+.status-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 6px;
+  flex-shrink: 0;
+}
+.status-dot.healthy { background: var(--healthy); box-shadow: 0 0 6px var(--healthy); }
+.status-dot.unhealthy { background: var(--unhealthy); box-shadow: 0 0 6px var(--unhealthy); }
+.status-dot.unknown { background: var(--unknown); }
+.status-dot.not-deployed { background: var(--not-deployed); }
+.status-dot.checking { background: var(--accent-yellow); animation: pulse 1s infinite; }
+.status-dot.planned { background: var(--planned); }
+.status-dot.config-needed { background: var(--config-needed); }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.card-status {
+  display: flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.card-status.healthy { color: var(--healthy); }
+.card-status.unhealthy { color: var(--unhealthy); }
+.card-status.unknown { color: var(--unknown); }
+.card-status.not-deployed { color: var(--not-deployed); }
+.card-status.checking { color: var(--accent-yellow); }
+.card-status.planned { color: var(--planned); }
+.card-status.config-needed { color: var(--config-needed); }
+
+.card-meta {
+  font-size: 10px;
+  color: var(--unknown);
+  margin-bottom: 10px;
+}
+.card-meta .response-time { color: var(--accent-blue); font-weight: 600; }
+
+.card-url {
+  font-size: 10px;
+  color: var(--accent-blue);
+  text-decoration: none;
+  word-break: break-all;
+}
+.card-url:hover { text-decoration: underline; }
+
+.card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.card-github {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  color: var(--text-muted);
+  text-decoration: none;
+  margin-top: 6px;
+}
+.card-github:hover { color: var(--text); }
+
+.card-planned-note {
+  font-size: 11px;
+  color: var(--planned);
+  font-style: italic;
+  margin-top: 6px;
+}
+
+.card-result {
+  margin-top: 10px;
+  background: #0a0a0a;
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  overflow: hidden;
+  display: none;
+}
+.card-result.visible { display: block; }
+.card-result-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  background: #0f0f0f;
+  border-bottom: 1px solid var(--card-border);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.card-result-close {
+  cursor: pointer;
+  color: var(--unknown);
+  font-size: 14px;
+}
+.card-result-close:hover { color: var(--text); }
+.card-result-body {
+  padding: 8px 10px;
+  font-size: 11px;
+  font-family: 'SFMono-Regular', 'Consolas', 'Liberation Mono', monospace;
+  color: var(--text-muted);
+  max-height: 200px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* ===== SETTINGS PANEL ===== */
+.settings-panel {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  margin-bottom: 28px;
+  overflow: hidden;
+  display: none;
+}
+.settings-panel.visible { display: block; }
+
+.settings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--card-border);
+  cursor: pointer;
+}
+.settings-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+.settings-body { padding: 18px; }
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.settings-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  min-width: 160px;
+}
+.settings-input {
+  flex: 1;
+  font-family: 'SFMono-Regular', 'Consolas', monospace;
+  font-size: 12px;
+  padding: 6px 10px;
+  background: #0a0a0a;
+  border: 1px solid var(--card-border);
+  border-radius: 4px;
+  color: var(--text);
+  outline: none;
+}
+.settings-input:focus { border-color: var(--accent-blue); }
+.settings-input::placeholder { color: var(--unknown); }
+
+.settings-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.settings-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--accent-blue);
+  margin: 16px 0 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--card-border);
+}
+.settings-section-title:first-child { margin-top: 0; border-top: none; padding-top: 0; }
+
+/* ===== ACTIVITY LOG ===== */
+.log-section {
+  margin-top: 28px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.log-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--card-border);
+}
+.log-title {
+  font-size: 13px;
+  font-weight: 700;
+}
+.log-clear {
+  font-size: 11px;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.log-clear:hover { color: var(--text); }
+
+.log-body {
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 4px 0;
+}
+.log-entry {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 5px 18px;
+  font-size: 11px;
+  font-family: 'SFMono-Regular', 'Consolas', monospace;
+  border-bottom: 1px solid #0a0a0a;
+}
+.log-entry:hover { background: #0a0a0a; }
+.log-time { color: var(--unknown); white-space: nowrap; flex-shrink: 0; }
+.log-msg { color: var(--text-muted); word-break: break-word; }
+.log-entry.success .log-msg { color: var(--healthy); }
+.log-entry.error .log-msg { color: var(--unhealthy); }
+.log-entry.warning .log-msg { color: var(--not-deployed); }
+.log-entry.info .log-msg { color: var(--accent-blue); }
+
+.log-empty {
+  padding: 20px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--unknown);
+}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #444; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .header { padding: 16px 18px; }
+  .main { padding: 18px; }
+  .section-grid { grid-template-columns: 1fr; }
+  .settings-row { flex-direction: column; align-items: stretch; }
+  .settings-label { min-width: auto; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-top">
+    <div class="header-title">DATA DRIVER PRO — Admin Dashboard</div>
+    <div class="header-controls">
+      <span class="header-status" id="masterStatus"><span id="healthyCount">0</span>/<span id="totalCount">21</span> services healthy</span>
+      <button class="btn" id="btnSettings" onclick="toggleSettings()">Settings</button>
+      <button class="btn" id="btnAutoRefresh" onclick="toggleAutoRefresh()">Auto-refresh: ON</button>
+      <button class="btn" onclick="refreshAll()">Refresh All</button>
+    </div>
+  </div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="progressBar"></div>
+  </div>
+</header>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- SETTINGS PANEL -->
+  <div class="settings-panel" id="settingsPanel">
+    <div class="settings-header" onclick="toggleSettingsBody()">
+      <div class="settings-title">Service URL Configuration</div>
+      <span style="color:var(--text-muted);font-size:12px" id="settingsToggleIcon">Collapse</span>
+    </div>
+    <div class="settings-body" id="settingsBody">
+      <p style="font-size:11px;color:var(--text-muted);margin-bottom:14px;">
+        Paste Railway URLs or API keys as services are deployed. Saved to localStorage automatically.
+      </p>
+
+      <div class="settings-section-title">Railway Service URLs</div>
+      <div id="settingsUrlRows"></div>
+
+      <div class="settings-section-title">API Keys (stored in localStorage only)</div>
+      <div id="settingsKeyRows"></div>
+
+      <div class="settings-actions">
+        <button class="btn" onclick="saveSettings()">Save All</button>
+        <button class="btn" onclick="resetSettings()">Reset to Defaults</button>
+        <button class="btn" onclick="exportSettings()">Export JSON</button>
+        <button class="btn" onclick="importSettingsPrompt()">Import JSON</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTIONS RENDERED BY JS -->
+  <div id="sectionsContainer"></div>
+
+  <!-- ACTIVITY LOG -->
+  <div class="log-section">
+    <div class="log-header">
+      <div class="log-title">Activity Log</div>
+      <div class="log-clear" onclick="clearLog()">Clear</div>
+    </div>
+    <div class="log-body" id="logBody">
+      <div class="log-empty">No activity yet. Waiting for first health check...</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ===== SERVICE REGISTRY =====
+const SERVICES = [
+  // SECTION 1: DATA ACQUISITION
+  {
+    id: 'dd-api', name: 'Data Driver API Gateway', section: 'Data Acquisition',
+    description: 'Core data API - contacts, metadata, exports', icon: '\u26A1',
+    url: 'https://datadriverapi.com', healthEndpoint: '/health',
+    configurable: false,
+    actions: [
+      { label: 'Health Check', method: 'GET', path: '/health' },
+      { label: 'Meta Summary', method: 'GET', path: '/meta/summary' }
+    ]
+  },
+  {
+    id: 'dd-supabase', name: 'Data Driver DB', section: 'Data Acquisition',
+    description: 'Verified contact storage (Supabase)', icon: '\uD83D\uDDC4\uFE0F',
+    url: 'https://smfgkhlwoszldfsxkvib.supabase.co', healthEndpoint: '/rest/v1/',
+    configurable: false, needsApiKey: 'SUPABASE_ANON_KEY',
+    actions: [
+      { label: 'Ping DB', method: 'GET', path: '/rest/v1/' }
+    ]
+  },
+  {
+    id: 'audiencelab', name: 'AudienceLab Builder', section: 'Data Acquisition',
+    description: 'Audience creation, export, clean, push to Supabase', icon: '\uD83C\uDFAF',
+    url: '', githubRepo: 'djdebtfree/audiencelab-builder', healthEndpoint: '/health',
+    configurable: true,
+    actions: [
+      { label: 'Test Build', method: 'POST', path: '/build-audience',
+        body: { audience_name: 'Test MVP', audience_type: 'keyword', intent_keywords: ['insurance'], filters: { state: 'FL', city: 'Tampa' } } },
+      { label: 'List Audiences', method: 'GET', path: '/audiences' },
+      { label: 'View Status', method: 'GET', path: '/status' }
+    ]
+  },
+  {
+    id: 'apify', name: 'Apify Account', section: 'Data Acquisition',
+    description: 'Web scraping platform - actors for FB + LI', icon: '\uD83D\uDD77\uFE0F',
+    url: 'https://api.apify.com/v2', healthEndpoint: '/acts?limit=1',
+    configurable: false, needsApiKey: 'APIFY_TOKEN', tokenParam: 'token',
+    actions: [
+      { label: 'List Actors', method: 'GET', path: '/acts?limit=5' }
+    ]
+  },
+  {
+    id: 'phantombuster', name: 'PhantomBuster', section: 'Data Acquisition',
+    description: 'Facebook group member extraction', icon: '\uD83D\uDC7B',
+    url: 'https://api.phantombuster.com/api/v2', healthEndpoint: '/agents/fetch-all',
+    configurable: false, needsApiKey: 'PB_KEY', headerKey: 'X-Phantombuster-Key',
+    actions: [
+      { label: 'List Agents', method: 'GET', path: '/agents/fetch-all' }
+    ]
+  },
+  // SECTION 2: LEAD NURTURING
+  {
+    id: 'ghl', name: 'GoHighLevel CRM', section: 'Lead Nurturing',
+    description: 'CRM + workflow engine - GHL Marketplace app', icon: '\uD83D\uDCCB',
+    url: 'https://services.leadconnectorhq.com', healthEndpoint: '',
+    configurable: false, needsApiKey: 'GHL_API_KEY',
+    status: 'config-needed',
+    actions: []
+  },
+  {
+    id: 'twilio', name: 'Twilio', section: 'Lead Nurturing',
+    description: 'SMS + WhatsApp delivery (~$0.015/msg)', icon: '\uD83D\uDCF1',
+    url: '', healthEndpoint: '',
+    configurable: false, status: 'config-needed',
+    actions: []
+  },
+  {
+    id: 'make', name: 'Make (Workflows)', section: 'Lead Nurturing',
+    description: 'Workflow orchestration - replaced MBN + ZapMail', icon: '\u2699\uFE0F',
+    url: '', healthEndpoint: '',
+    configurable: false, status: 'config-needed',
+    actions: []
+  },
+  // SECTION 3: AI AGENT LAYER
+  {
+    id: 'liveavatar', name: 'LiveAvatar SDK Agent', section: 'AI Agent Layer',
+    description: 'Sandy Beach avatar - visitor recognition + GHL CRM logging', icon: '\uD83C\uDFAD',
+    url: '', githubRepo: 'djdebtfree/liveavatar-sdk-agent', healthEndpoint: '/health',
+    configurable: true,
+    actions: [
+      { label: 'Test Session', method: 'POST', path: '/session/start', body: {} },
+      { label: 'GHL Lookup', method: 'GET', path: '/api/contact/lookup?query=test@test.com' },
+      { label: 'View Status', method: 'GET', path: '/session/status' }
+    ]
+  },
+  {
+    id: 'sandy-sms', name: 'Sandy Beach SMS Agent', section: 'AI Agent Layer',
+    description: 'SMS/email follow-up automation via GHL', icon: '\uD83D\uDCAC',
+    url: '', githubRepo: '', healthEndpoint: '/health',
+    configurable: true,
+    actions: [
+      { label: 'View Status', method: 'GET', path: '/status' }
+    ]
+  },
+  {
+    id: 'agent-supabase', name: 'Pipeline Lite Agent DB', section: 'AI Agent Layer',
+    description: 'Agent state + outcomes (Supabase)', icon: '\uD83E\uDDE0',
+    url: 'https://zymepbxosrpprrtcmmqi.supabase.co', healthEndpoint: '/rest/v1/',
+    configurable: false, needsApiKey: 'AGENT_SUPABASE_ANON_KEY',
+    actions: [
+      { label: 'Ping DB', method: 'GET', path: '/rest/v1/' }
+    ]
+  },
+  {
+    id: 'qclaw', name: 'QClaw Knowledge Graph', section: 'AI Agent Layer',
+    description: 'Local knowledge graph daemon - agent coordination', icon: '\uD83E\uDD9E',
+    url: 'http://localhost:3000', healthEndpoint: '/health',
+    configurable: false, localOnly: true,
+    actions: [
+      { label: 'Status', method: 'GET', path: '/health' }
+    ]
+  },
+  // SECTION 4: SOCIAL ENRICHMENT
+  {
+    id: 'fb-pipeline', name: 'FB Enrichment Pipeline', section: 'Social Enrichment',
+    description: 'Facebook profile scraping to Supabase to DD enrichment', icon: '\uD83D\uDCD8',
+    url: '', githubRepo: 'djdebtfree/fb-enrichment-pipeline', healthEndpoint: '/health',
+    configurable: true,
+    actions: [
+      { label: 'Test Scrape (5)', method: 'POST', path: '/scrape',
+        body: { actor: 'search', query: 'insurance agents Florida', maxProfiles: 5 } },
+      { label: 'View Status', method: 'GET', path: '/status' },
+      { label: 'View Results', method: 'GET', path: '/results?limit=10' }
+    ]
+  },
+  {
+    id: 'li-pipeline', name: 'LI Enrichment Pipeline', section: 'Social Enrichment',
+    description: 'LinkedIn profile scraping to Supabase to DD enrichment', icon: '\uD83D\uDCBC',
+    url: '', githubRepo: 'djdebtfree/li-enrichment-pipeline', healthEndpoint: '/health',
+    configurable: true,
+    actions: [
+      { label: 'Test Scrape', method: 'POST', path: '/scrape',
+        body: { actor: 'search', query: 'insurance agents', maxProfiles: 5 } },
+      { label: 'View Status', method: 'GET', path: '/status' },
+      { label: 'View Results', method: 'GET', path: '/results?limit=10&format=json' }
+    ]
+  },
+  {
+    id: 'li-validator', name: 'LI Reverse Validator', section: 'Social Enrichment',
+    description: 'Validates DD records against LinkedIn - THE MONEY SERVICE', icon: '\uD83D\uDD25',
+    url: '', githubRepo: 'djdebtfree/li-reverse-validator', healthEndpoint: '/health',
+    configurable: true,
+    actions: [
+      { label: 'Validate Batch (5)', method: 'POST', path: '/validate',
+        body: { table: 'Insurance CRM Seekers', batchSize: 5 } },
+      { label: 'View Hot Leads', method: 'GET', path: '/hot-leads?limit=10' },
+      { label: 'View Status', method: 'GET', path: '/status' }
+    ]
+  },
+  // SECTION 5: VOICE + VISUAL
+  {
+    id: 'elevenlabs', name: 'ElevenLabs', section: 'Voice + Visual',
+    description: 'Voice synthesis for Sandy Beach', icon: '\uD83D\uDD0A',
+    url: 'https://api.elevenlabs.io/v1', healthEndpoint: '/user',
+    configurable: false, needsApiKey: 'ELEVENLABS_API_KEY', headerKey: 'xi-api-key',
+    actions: [
+      { label: 'Check Credits', method: 'GET', path: '/user' },
+      { label: 'List Voices', method: 'GET', path: '/voices' }
+    ]
+  },
+  {
+    id: 'vapi', name: 'VAPI Voice Squad', section: 'Voice + Visual',
+    description: '5-agent voice call system - NOT YET BUILT', icon: '\uD83D\uDCDE',
+    url: '', healthEndpoint: '',
+    configurable: false, status: 'planned',
+    plannedNote: 'Terminal 5 - VAPI voice squad deployment',
+    actions: []
+  },
+  {
+    id: 'liveavatar-api', name: 'LiveAvatar / HeyGen API', section: 'Voice + Visual',
+    description: 'Avatar streaming - June preset', icon: '\uD83C\uDFAC',
+    url: 'https://api.liveavatar.com/v1', healthEndpoint: '/avatars',
+    configurable: false, needsApiKey: 'LIVEAVATAR_API_KEY', headerKey: 'X-API-KEY',
+    actions: [
+      { label: 'List Avatars', method: 'GET', path: '/avatars' }
+    ]
+  },
+  // SECTION 6: CUSTOMER-FACING
+  {
+    id: 'trydatadriver', name: 'trydatadriver.com', section: 'Customer-Facing',
+    description: 'Data Driver landing page (Lovable/React SPA)', icon: '\uD83C\uDF10',
+    url: 'https://trydatadriver.com', healthEndpoint: '/',
+    configurable: false, healthMethod: 'HEAD',
+    actions: [
+      { label: 'Load Test', method: 'HEAD', path: '/' }
+    ]
+  },
+  {
+    id: 'geneleven', name: 'geneleven.app', section: 'Customer-Facing',
+    description: 'GenEleven Studio (Lovable/React SPA)', icon: '\uD83E\uDDEC',
+    url: 'https://geneleven.app', healthEndpoint: '/',
+    configurable: false, healthMethod: 'HEAD',
+    actions: [
+      { label: 'Load Test', method: 'HEAD', path: '/' }
+    ]
+  },
+  {
+    id: 'stripe', name: 'Stripe Payments', section: 'Customer-Facing',
+    description: '$497 lifetime + $0.25/contact rebill', icon: '\uD83D\uDCB3',
+    url: 'https://api.stripe.com/v1', healthEndpoint: '/balance',
+    configurable: false, needsApiKey: 'STRIPE_SECRET_KEY', authBearer: true,
+    actions: [
+      { label: 'Check Balance', method: 'GET', path: '/balance' }
+    ]
+  }
+];
+
+const SECTION_ORDER = [
+  'Data Acquisition', 'Lead Nurturing', 'AI Agent Layer',
+  'Social Enrichment', 'Voice + Visual', 'Customer-Facing'
+];
+
+const CONFIGURABLE_URLS = [
+  { id: 'audiencelab', label: 'AudienceLab Builder' },
+  { id: 'liveavatar', label: 'LiveAvatar SDK Agent' },
+  { id: 'sandy-sms', label: 'Sandy Beach SMS Agent' },
+  { id: 'fb-pipeline', label: 'FB Enrichment Pipeline' },
+  { id: 'li-pipeline', label: 'LI Enrichment Pipeline' },
+  { id: 'li-validator', label: 'LI Reverse Validator' },
+  { id: 'dd-api', label: 'DD API Gateway' }
+];
+
+const CONFIGURABLE_KEYS = [
+  { id: 'SUPABASE_ANON_KEY', label: 'Supabase Anon Key (DD)' },
+  { id: 'AGENT_SUPABASE_ANON_KEY', label: 'Supabase Anon Key (Agent)' },
+  { id: 'APIFY_TOKEN', label: 'Apify Token' },
+  { id: 'PB_KEY', label: 'PhantomBuster Key' },
+  { id: 'GHL_API_KEY', label: 'GHL API Key' },
+  { id: 'GHL_LOCATION_ID', label: 'GHL Location ID' },
+  { id: 'ELEVENLABS_API_KEY', label: 'ElevenLabs API Key' },
+  { id: 'LIVEAVATAR_API_KEY', label: 'LiveAvatar API Key' },
+  { id: 'STRIPE_SECRET_KEY', label: 'Stripe Secret Key' }
+];
+
+// ===== STATE =====
+let serviceStates = {};
+let autoRefreshEnabled = true;
+let autoRefreshTimer = null;
+let logEntries = [];
+
+// ===== INIT =====
+function init() {
+  loadSettings();
+  renderSettingsPanel();
+  renderSections();
+  startAutoRefresh();
+  addLogEntry('Dashboard initialized. Starting health checks...', 'info');
+  refreshAll();
+}
+
+// ===== SETTINGS =====
+function loadSettings() {
+  const saved = localStorage.getItem('ddpro-settings');
+  if (saved) {
+    try {
+      const data = JSON.parse(saved);
+      // Apply saved URLs
+      if (data.urls) {
+        for (const [id, url] of Object.entries(data.urls)) {
+          const svc = SERVICES.find(s => s.id === id);
+          if (svc && url) svc.url = url;
+        }
+      }
+      // Apply saved keys
+      if (data.keys) {
+        window._apiKeys = data.keys;
+      }
+    } catch (e) { console.error('Failed to load settings', e); }
+  }
+  if (!window._apiKeys) window._apiKeys = {};
+}
+
+function saveSettings() {
+  const urls = {};
+  const keys = {};
+  CONFIGURABLE_URLS.forEach(c => {
+    const el = document.getElementById('setting-url-' + c.id);
+    if (el) {
+      urls[c.id] = el.value.trim();
+      const svc = SERVICES.find(s => s.id === c.id);
+      if (svc) svc.url = el.value.trim();
+    }
+  });
+  CONFIGURABLE_KEYS.forEach(c => {
+    const el = document.getElementById('setting-key-' + c.id);
+    if (el) keys[c.id] = el.value.trim();
+  });
+  window._apiKeys = keys;
+  localStorage.setItem('ddpro-settings', JSON.stringify({ urls, keys }));
+  addLogEntry('Settings saved to localStorage', 'info');
+  renderSections();
+}
+
+function resetSettings() {
+  localStorage.removeItem('ddpro-settings');
+  window._apiKeys = {};
+  location.reload();
+}
+
+function exportSettings() {
+  const saved = localStorage.getItem('ddpro-settings') || '{}';
+  const blob = new Blob([saved], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'ddpro-settings.json';
+  a.click();
+  addLogEntry('Settings exported', 'info');
+}
+
+function importSettingsPrompt() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        localStorage.setItem('ddpro-settings', JSON.stringify(data));
+        addLogEntry('Settings imported. Reloading...', 'info');
+        location.reload();
+      } catch (err) {
+        addLogEntry('Import failed: invalid JSON', 'error');
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+function toggleSettings() {
+  const panel = document.getElementById('settingsPanel');
+  panel.classList.toggle('visible');
+  document.getElementById('btnSettings').classList.toggle('active');
+}
+
+function toggleSettingsBody() {
+  const body = document.getElementById('settingsBody');
+  const icon = document.getElementById('settingsToggleIcon');
+  if (body.style.display === 'none') {
+    body.style.display = '';
+    icon.textContent = 'Collapse';
+  } else {
+    body.style.display = 'none';
+    icon.textContent = 'Expand';
+  }
+}
+
+function renderSettingsPanel() {
+  const urlContainer = document.getElementById('settingsUrlRows');
+  const keyContainer = document.getElementById('settingsKeyRows');
+
+  urlContainer.innerHTML = CONFIGURABLE_URLS.map(c => {
+    const svc = SERVICES.find(s => s.id === c.id);
+    const val = svc ? svc.url : '';
+    return `<div class="settings-row">
+      <label class="settings-label">${c.label}</label>
+      <input class="settings-input" id="setting-url-${c.id}"
+        placeholder="https://your-service.up.railway.app"
+        value="${escapeAttr(val)}"
+        onchange="saveSettings()">
+    </div>`;
+  }).join('');
+
+  keyContainer.innerHTML = CONFIGURABLE_KEYS.map(c => {
+    const val = (window._apiKeys && window._apiKeys[c.id]) || '';
+    return `<div class="settings-row">
+      <label class="settings-label">${c.label}</label>
+      <input class="settings-input" id="setting-key-${c.id}"
+        type="password"
+        placeholder="Paste API key here"
+        value="${escapeAttr(val)}"
+        onchange="saveSettings()">
+    </div>`;
+  }).join('');
+}
+
+// ===== RENDER =====
+function renderSections() {
+  const container = document.getElementById('sectionsContainer');
+  container.innerHTML = '';
+
+  SECTION_ORDER.forEach(sectionName => {
+    const services = SERVICES.filter(s => s.section === sectionName);
+    const div = document.createElement('div');
+    div.className = 'section';
+    div.innerHTML = `
+      <div class="section-header" onclick="this.classList.toggle('collapsed')">
+        <span class="section-toggle">\u25BC</span>
+        <span class="section-title">${sectionName}</span>
+        <span class="section-count">(${services.length})</span>
+      </div>
+      <div class="section-grid">
+        ${services.map(s => renderCard(s)).join('')}
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function renderCard(svc) {
+  const state = serviceStates[svc.id] || {};
+  const effectiveStatus = getEffectiveStatus(svc, state);
+  const statusLabel = getStatusLabel(effectiveStatus, state);
+  const hasUrl = !!getServiceUrl(svc);
+
+  let metaHtml = '';
+  if (state.lastChecked) {
+    const ago = timeAgo(state.lastChecked);
+    metaHtml = `Checked ${ago}`;
+    if (state.responseTime) metaHtml += ` &middot; <span class="response-time">${state.responseTime}ms</span>`;
+  }
+
+  let urlHtml = '';
+  if (hasUrl) {
+    const u = getServiceUrl(svc);
+    urlHtml = `<a class="card-url" href="${escapeAttr(u)}" target="_blank" rel="noopener">${u}</a>`;
+  } else if (svc.githubRepo) {
+    urlHtml = `<a class="card-github" href="https://github.com/${svc.githubRepo}" target="_blank" rel="noopener">
+      \u{1F4E6} github.com/${svc.githubRepo}
+    </a>`;
+  }
+
+  let actionsHtml = '';
+  if (svc.actions && svc.actions.length > 0 && hasUrl) {
+    actionsHtml = `<div class="card-actions">
+      ${svc.actions.map((a, i) => `<button class="btn-action" id="${svc.id}-action-${i}" onclick="executeAction('${svc.id}', ${i})">${a.label}</button>`).join('')}
+    </div>`;
+  }
+
+  let plannedHtml = '';
+  if (svc.plannedNote) {
+    plannedHtml = `<div class="card-planned-note">${svc.plannedNote}</div>`;
+  }
+
+  let notDeployedHtml = '';
+  if (effectiveStatus === 'not-deployed' && svc.githubRepo) {
+    notDeployedHtml = `<div style="margin-top:8px;font-size:11px;color:var(--not-deployed);">
+      GitHub repo ready. Paste Railway URL in Settings to activate.
+    </div>`;
+  }
+
+  return `<div class="card ${effectiveStatus}" id="card-${svc.id}">
+    <div class="card-head">
+      <div class="card-icon-name">
+        <span class="card-icon">${svc.icon}</span>
+        <span class="card-name">${svc.name}</span>
+      </div>
+    </div>
+    <div class="card-desc">${svc.description}</div>
+    <div class="card-status ${effectiveStatus}">
+      <span class="status-dot ${effectiveStatus}"></span>
+      ${statusLabel}
+    </div>
+    <div class="card-meta">${metaHtml}</div>
+    ${urlHtml}
+    ${actionsHtml}
+    ${plannedHtml}
+    ${notDeployedHtml}
+    <div class="card-result" id="result-${svc.id}">
+      <div class="card-result-header">
+        <span id="result-title-${svc.id}">Result</span>
+        <span class="card-result-close" onclick="closeResult('${svc.id}')">\u2715</span>
+      </div>
+      <div class="card-result-body" id="result-body-${svc.id}"></div>
+    </div>
+  </div>`;
+}
+
+function getEffectiveStatus(svc, state) {
+  if (svc.status === 'planned') return 'planned';
+  if (svc.status === 'config-needed') return 'config-needed';
+  if (state.status) return state.status;
+  if (!getServiceUrl(svc)) return 'not-deployed';
+  return 'unknown';
+}
+
+function getStatusLabel(status, state) {
+  switch (status) {
+    case 'healthy': return 'HEALTHY' + (state.statusCode ? ` (${state.statusCode})` : '');
+    case 'unhealthy': return 'UNHEALTHY' + (state.statusCode ? ` (${state.statusCode})` : '');
+    case 'not-deployed': return 'NOT DEPLOYED';
+    case 'planned': return 'PLANNED';
+    case 'config-needed': return 'CONFIG NEEDED';
+    case 'checking': return 'CHECKING...';
+    case 'timeout': return 'TIMEOUT';
+    case 'error': return 'ERROR';
+    case 'cors-blocked': return 'ALIVE (CORS blocked)';
+    default: return 'UNKNOWN';
+  }
+}
+
+function getServiceUrl(svc) {
+  return svc.url || '';
+}
+
+// ===== HEALTH CHECKS =====
+async function healthCheck(svc) {
+  const url = getServiceUrl(svc);
+  if (!url || svc.status === 'planned' || svc.status === 'config-needed') return;
+  if (svc.localOnly && !location.hostname.match(/localhost|127\.0\.0\.1/)) {
+    updateServiceStatus(svc.id, { status: 'unknown', note: 'Local only - run on Keith\'s machine' });
+    return;
+  }
+
+  updateServiceStatus(svc.id, { status: 'checking' });
+  renderSections();
+
+  const fullUrl = url + svc.healthEndpoint;
+  const method = svc.healthMethod || 'GET';
+  const headers = buildHeaders(svc);
+
+  let finalUrl = fullUrl;
+  // Handle token-in-URL services like Apify
+  if (svc.needsApiKey && svc.tokenParam) {
+    const key = getApiKey(svc.needsApiKey);
+    if (key) {
+      const sep = finalUrl.includes('?') ? '&' : '?';
+      finalUrl += `${sep}${svc.tokenParam}=${key}`;
+    }
+  }
+
+  try {
+    const start = Date.now();
+    const response = await fetch(finalUrl, {
+      method,
+      headers,
+      signal: AbortSignal.timeout(10000)
+    });
+    const elapsed = Date.now() - start;
+    updateServiceStatus(svc.id, {
+      status: response.ok ? 'healthy' : 'unhealthy',
+      statusCode: response.status,
+      responseTime: elapsed,
+      lastChecked: new Date()
+    });
+    addLogEntry(`${svc.name}: health check ${response.status} (${elapsed}ms)`,
+      response.ok ? 'success' : 'error');
+  } catch (e) {
+    // CORS fallback: try no-cors
+    try {
+      const start = Date.now();
+      await fetch(finalUrl, { method, mode: 'no-cors', signal: AbortSignal.timeout(10000) });
+      const elapsed = Date.now() - start;
+      updateServiceStatus(svc.id, {
+        status: 'cors-blocked',
+        responseTime: elapsed,
+        lastChecked: new Date(),
+        note: 'Server responded but CORS blocked body'
+      });
+      addLogEntry(`${svc.name}: alive but CORS blocked (${elapsed}ms)`, 'warning');
+    } catch (e2) {
+      updateServiceStatus(svc.id, {
+        status: e.name === 'TimeoutError' ? 'timeout' : 'error',
+        error: e.message,
+        lastChecked: new Date()
+      });
+      addLogEntry(`${svc.name}: ${e.name === 'TimeoutError' ? 'TIMEOUT' : 'ERROR'} - ${e.message}`, 'error');
+    }
+  }
+  renderSections();
+  updateMasterStatus();
+}
+
+function buildHeaders(svc) {
+  const headers = {};
+  if (svc.needsApiKey) {
+    const key = getApiKey(svc.needsApiKey);
+    if (key) {
+      if (svc.authBearer) {
+        headers['Authorization'] = 'Bearer ' + key;
+      } else if (svc.headerKey) {
+        headers[svc.headerKey] = key;
+      } else {
+        headers['apikey'] = key;
+      }
+    }
+  }
+  return headers;
+}
+
+function getApiKey(keyName) {
+  return (window._apiKeys && window._apiKeys[keyName]) || '';
+}
+
+async function refreshAll() {
+  addLogEntry('Starting full refresh...', 'info');
+  const promises = SERVICES.map(svc => healthCheck(svc));
+  await Promise.allSettled(promises);
+  updateMasterStatus();
+  addLogEntry(`Refresh complete: ${countHealthy()} services responding`, 'info');
+}
+
+function updateServiceStatus(id, state) {
+  serviceStates[id] = { ...(serviceStates[id] || {}), ...state };
+}
+
+function updateMasterStatus() {
+  const healthy = countHealthy();
+  const total = SERVICES.length;
+  document.getElementById('healthyCount').textContent = healthy;
+  document.getElementById('totalCount').textContent = total;
+  const pct = total > 0 ? (healthy / total * 100) : 0;
+  document.getElementById('progressBar').style.width = pct + '%';
+}
+
+function countHealthy() {
+  return SERVICES.filter(s => {
+    const st = serviceStates[s.id];
+    return st && (st.status === 'healthy' || st.status === 'cors-blocked');
+  }).length;
+}
+
+// ===== ACTIONS =====
+async function executeAction(serviceId, actionIndex) {
+  const svc = SERVICES.find(s => s.id === serviceId);
+  const action = svc.actions[actionIndex];
+  const btn = document.getElementById(`${serviceId}-action-${actionIndex}`);
+
+  if (!btn) return;
+  btn.disabled = true;
+  btn.classList.add('running');
+  btn.textContent = 'Running...';
+
+  const url = getServiceUrl(svc);
+  if (!url) {
+    showActionResult(serviceId, { action: action.label, status: 'ERROR', error: 'No URL configured' });
+    addLogEntry(`${svc.name}: ${action.label} - no URL configured`, 'error');
+    btn.disabled = false;
+    btn.classList.remove('running');
+    btn.textContent = action.label;
+    return;
+  }
+
+  let fullPath = action.path;
+  // Handle token-in-URL
+  if (svc.needsApiKey && svc.tokenParam) {
+    const key = getApiKey(svc.needsApiKey);
+    if (key) {
+      const sep = fullPath.includes('?') ? '&' : '?';
+      fullPath += `${sep}${svc.tokenParam}=${key}`;
+    }
+  }
+
+  try {
+    const start = Date.now();
+    const options = {
+      method: action.method || 'GET',
+      headers: { ...buildHeaders(svc), 'Content-Type': 'application/json' },
+      signal: AbortSignal.timeout(30000)
+    };
+    if (action.body && (action.method === 'POST' || action.method === 'PUT')) {
+      options.body = JSON.stringify(action.body);
+    }
+
+    const response = await fetch(url + fullPath, options);
+    const elapsed = Date.now() - start;
+
+    let data;
+    const ct = response.headers.get('content-type') || '';
+    if (ct.includes('json')) {
+      data = await response.json();
+    } else {
+      data = await response.text();
+    }
+
+    showActionResult(serviceId, {
+      action: action.label,
+      status: response.status,
+      time: elapsed,
+      data
+    });
+    addLogEntry(`${svc.name}: ${action.label} \u2192 ${response.status} (${elapsed}ms)`,
+      response.ok ? 'success' : 'error');
+
+  } catch (err) {
+    showActionResult(serviceId, {
+      action: action.label,
+      status: 'ERROR',
+      error: err.message
+    });
+    addLogEntry(`${svc.name}: ${action.label} \u2192 FAILED: ${err.message}`, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.classList.remove('running');
+    btn.textContent = action.label;
+  }
+}
+
+function showActionResult(serviceId, result) {
+  const container = document.getElementById('result-' + serviceId);
+  const title = document.getElementById('result-title-' + serviceId);
+  const body = document.getElementById('result-body-' + serviceId);
+  if (!container) return;
+
+  title.textContent = `${result.action} \u2192 ${result.status}${result.time ? ' (' + result.time + 'ms)' : ''}`;
+
+  if (result.error) {
+    body.textContent = result.error;
+  } else if (typeof result.data === 'object') {
+    body.textContent = JSON.stringify(result.data, null, 2);
+  } else {
+    body.textContent = String(result.data).substring(0, 2000);
+  }
+
+  container.classList.add('visible');
+}
+
+function closeResult(serviceId) {
+  const container = document.getElementById('result-' + serviceId);
+  if (container) container.classList.remove('visible');
+}
+
+// ===== AUTO-REFRESH =====
+function startAutoRefresh() {
+  if (autoRefreshTimer) clearInterval(autoRefreshTimer);
+  if (autoRefreshEnabled) {
+    autoRefreshTimer = setInterval(() => refreshAll(), 60000);
+  }
+}
+
+function toggleAutoRefresh() {
+  autoRefreshEnabled = !autoRefreshEnabled;
+  const btn = document.getElementById('btnAutoRefresh');
+  btn.textContent = autoRefreshEnabled ? 'Auto-refresh: ON' : 'Auto-refresh: OFF';
+  btn.classList.toggle('active', autoRefreshEnabled);
+  startAutoRefresh();
+  addLogEntry(`Auto-refresh ${autoRefreshEnabled ? 'enabled' : 'disabled'}`, 'info');
+}
+
+// ===== ACTIVITY LOG =====
+function addLogEntry(message, type) {
+  const now = new Date();
+  const ts = now.toLocaleTimeString('en-US', { hour12: false });
+  logEntries.unshift({ time: ts, message, type });
+  if (logEntries.length > 100) logEntries = logEntries.slice(0, 100);
+  renderLog();
+}
+
+function renderLog() {
+  const body = document.getElementById('logBody');
+  if (logEntries.length === 0) {
+    body.innerHTML = '<div class="log-empty">No activity yet.</div>';
+    return;
+  }
+  body.innerHTML = logEntries.map(e =>
+    `<div class="log-entry ${e.type}">
+      <span class="log-time">${e.time}</span>
+      <span class="log-msg">${escapeHtml(e.message)}</span>
+    </div>`
+  ).join('');
+}
+
+function clearLog() {
+  logEntries = [];
+  renderLog();
+}
+
+// ===== HELPERS =====
+function timeAgo(date) {
+  const d = date instanceof Date ? date : new Date(date);
+  const secs = Math.floor((Date.now() - d.getTime()) / 1000);
+  if (secs < 5) return 'just now';
+  if (secs < 60) return secs + 's ago';
+  const mins = Math.floor(secs / 60);
+  if (mins < 60) return mins + 'm ago';
+  const hrs = Math.floor(mins / 60);
+  return hrs + 'h ago';
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function escapeAttr(str) {
+  return String(str || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// ===== BOOT =====
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
