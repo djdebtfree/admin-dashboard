@@ -604,10 +604,13 @@ const SERVICES = [
   },
   {
     id: 'make', name: 'Make (Workflows)', section: 'Lead Nurturing',
-    description: 'Workflow orchestration - replaced MBN + ZapMail', icon: '\u2699\uFE0F',
-    url: '', healthEndpoint: '',
-    configurable: false, status: 'config-needed',
-    actions: []
+    description: 'Workflow orchestration — AJF Financial Group (Core plan, 14 active / 50 total scenarios)', icon: '\u2699\uFE0F',
+    url: 'https://us1.make.com', healthEndpoint: '/api/v2/organizations',
+    needsApiKey: 'MAKE_API_KEY', authToken: true,
+    configurable: true,
+    actions: [
+      { label: 'List Scenarios', method: 'GET', path: '/api/v2/scenarios?organizationId=1434046&pg%5Blimit%5D=20&pg%5BsortBy%5D=name&pg%5BsortDir%5D=asc' }
+    ]
   },
   // SECTION 3: AI AGENT LAYER
   {
@@ -767,7 +770,8 @@ const CONFIGURABLE_KEYS = [
   { id: 'GHL_LOCATION_ID', label: 'GHL Location ID' },
   { id: 'ELEVENLABS_API_KEY', label: 'ElevenLabs API Key' },
   { id: 'LIVEAVATAR_API_KEY', label: 'LiveAvatar API Key' },
-  { id: 'STRIPE_SECRET_KEY', label: 'Stripe Secret Key' }
+  { id: 'STRIPE_SECRET_KEY', label: 'Stripe Secret Key' },
+  { id: 'MAKE_API_KEY', label: 'Make.com API Token' }
 ];
 
 // ===== STATE =====
@@ -1107,7 +1111,9 @@ function buildHeaders(svc) {
   if (svc.needsApiKey) {
     const key = getApiKey(svc.needsApiKey);
     if (key) {
-      if (svc.authBearer) {
+      if (svc.authToken) {
+        headers['Authorization'] = 'Token ' + key;
+      } else if (svc.authBearer) {
         headers['Authorization'] = 'Bearer ' + key;
       } else if (svc.headerKey) {
         headers[svc.headerKey] = key;
