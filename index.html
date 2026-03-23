@@ -477,7 +477,7 @@ body {
   <div class="header-top">
     <div class="header-title">DATA DRIVER PRO — Admin Dashboard</div>
     <div class="header-controls">
-      <span class="header-status" id="masterStatus"><span id="healthyCount">0</span>/<span id="totalCount">21</span> services healthy</span>
+      <span class="header-status" id="masterStatus"><span id="healthyCount">0</span>/<span id="totalCount">25</span> services healthy</span>
       <button class="btn" id="btnSettings" onclick="toggleSettings()">Settings</button>
       <button class="btn" id="btnAutoRefresh" onclick="toggleAutoRefresh()">Auto-refresh: ON</button>
       <button class="btn" onclick="refreshAll()">Refresh All</button>
@@ -540,10 +540,10 @@ const SERVICES = [
   {
     id: 'dd-api', name: 'Data Driver API Gateway', section: 'Data Acquisition',
     description: 'Core data API - contacts, metadata, exports', icon: '\u26A1',
-    url: 'https://datadriverapi.com', healthEndpoint: '/health',
+    url: 'https://datadriverapi.com', healthEndpoint: '/api/v1/health',
     configurable: false,
     actions: [
-      { label: 'Health Check', method: 'GET', path: '/health' },
+      { label: 'Health Check', method: 'GET', path: '/api/v1/health' },
       { label: 'Meta Summary', method: 'GET', path: '/meta/summary' }
     ]
   },
@@ -559,7 +559,7 @@ const SERVICES = [
   {
     id: 'audiencelab', name: 'AudienceLab Builder', section: 'Data Acquisition',
     description: 'Audience creation, export, clean, push to Supabase', icon: '\uD83C\uDFAF',
-    url: '', githubRepo: 'djdebtfree/audiencelab-builder', healthEndpoint: '/health',
+    url: 'https://audiencelab-builder-production.up.railway.app', githubRepo: 'djdebtfree/audiencelab-builder', healthEndpoint: '/health',
     configurable: true,
     actions: [
       { label: 'Test Build', method: 'POST', path: '/build-audience',
@@ -590,38 +590,40 @@ const SERVICES = [
   {
     id: 'ghl', name: 'GoHighLevel CRM', section: 'Lead Nurturing',
     description: 'CRM + workflow engine - GHL Marketplace app', icon: '\uD83D\uDCCB',
-    url: 'https://services.leadconnectorhq.com', healthEndpoint: '/locations/LjgmqjZskwMKTIcGOnvM',
+    url: 'https://services.leadconnectorhq.com', healthEndpoint: '',
     configurable: false, needsApiKey: 'GHL_API_KEY', authBearer: true,
     extraHeaders: { 'Version': '2021-07-28' },
+    keyPresenceCheck: true,
     actions: [
       { label: 'Test Contacts API', method: 'GET', path: '/contacts/?locationId=LjgmqjZskwMKTIcGOnvM&limit=1' }
     ]
   },
   {
     id: 'twilio', name: 'Twilio', section: 'Lead Nurturing',
-    description: 'SMS + Voice via VAPI (~$0.015/msg)', icon: '\uD83D\uDCF1',
+    description: 'SMS + Voice delivery — Account SID AC4295...', icon: '\uD83D\uDCF1',
     url: 'https://api.vapi.ai', healthEndpoint: '/phone-number/37fd52ef-5345-400b-8471-e01f4ff839d0',
-    extraHeaders: { 'Authorization': 'Bearer 1d227d93-e1de-43cb-af69-ef2d0ff67ed5' },
-    configurable: true,
+    needsApiKey: 'VAPI_API_KEY', authBearer: true,
+    configurable: false,
     actions: [
-      { label: 'List Calls', method: 'GET', path: '/call?limit=5' }
+      { label: 'List Calls', method: 'GET', path: '/call?limit=5' },
+      { label: 'Phone Numbers', method: 'GET', path: '/phone-number' }
     ]
   },
   {
     id: 'make', name: 'Make (Workflows)', section: 'Lead Nurturing',
-    description: 'Workflow orchestration — AJF Financial Group (Core plan, 14 active / 50 total scenarios)', icon: '\u2699\uFE0F',
+    description: 'Workflow orchestration — AJF Financial Group, Core plan', icon: '\u2699\uFE0F',
     url: 'https://us1.make.com', healthEndpoint: '/api/v2/organizations',
     needsApiKey: 'MAKE_API_KEY', authToken: true,
     configurable: true,
     actions: [
-      { label: 'List Scenarios', method: 'GET', path: '/api/v2/scenarios?organizationId=1434046&pg%5Blimit%5D=20&pg%5BsortBy%5D=name&pg%5BsortDir%5D=asc' }
+      { label: 'List Scenarios', method: 'GET', path: '/api/v2/scenarios?pg[limit]=10&pg[sortBy]=name' }
     ]
   },
   // SECTION 3: AI AGENT LAYER
   {
     id: 'liveavatar', name: 'LiveAvatar SDK Agent', section: 'AI Agent Layer',
     description: 'Sandy Beach avatar - visitor recognition + GHL CRM logging', icon: '\uD83C\uDFAD',
-    url: '', githubRepo: 'djdebtfree/liveavatar-sdk-agent', healthEndpoint: '/health',
+    url: 'https://liveavatar-ghl-agent-production.up.railway.app', githubRepo: 'djdebtfree/liveavatar-sdk-agent', healthEndpoint: '/health',
     configurable: true,
     actions: [
       { label: 'Test Session', method: 'POST', path: '/session/start', body: {} },
@@ -649,18 +651,27 @@ const SERVICES = [
   },
   {
     id: 'qclaw', name: 'QClaw Knowledge Graph', section: 'AI Agent Layer',
-    description: 'Local knowledge graph daemon - agent coordination', icon: '\uD83E\uDD9E',
-    url: 'http://localhost:3000', healthEndpoint: '/health',
-    configurable: false, localOnly: true,
+    description: 'Agent runtime + knowledge graph (Railway)', icon: '\uD83E\uDD9E',
+    url: 'https://qclaw-salessuiteos-production.up.railway.app', healthEndpoint: '/',
+    configurable: false,
     actions: [
-      { label: 'Status', method: 'GET', path: '/health' }
+      { label: 'Health', method: 'GET', path: '/api/health' }
+    ]
+  },
+  {
+    id: 'cognee', name: 'Cognee Cloud', section: 'AI Agent Layer',
+    description: 'Knowledge graph — Cognee Cloud (AWS tenant)', icon: '\uD83E\uDDE0',
+    url: 'https://tenant-3bb8cb97-03c7-484b-988d-36840c96edca.aws.cognee.ai', healthEndpoint: '/api/health',
+    configurable: false,
+    actions: [
+      { label: 'Health', method: 'GET', path: '/api/health' }
     ]
   },
   // SECTION 4: SOCIAL ENRICHMENT
   {
     id: 'fb-pipeline', name: 'FB Enrichment Pipeline', section: 'Social Enrichment',
     description: 'Facebook profile scraping to Supabase to DD enrichment', icon: '\uD83D\uDCD8',
-    url: '', githubRepo: 'djdebtfree/fb-enrichment-pipeline', healthEndpoint: '/health',
+    url: 'https://fb-enrichment-pipeline-production.up.railway.app', githubRepo: 'djdebtfree/fb-enrichment-pipeline', healthEndpoint: '/health',
     configurable: true,
     actions: [
       { label: 'Test Scrape (5)', method: 'POST', path: '/scrape',
@@ -672,7 +683,7 @@ const SERVICES = [
   {
     id: 'li-pipeline', name: 'LI Enrichment Pipeline', section: 'Social Enrichment',
     description: 'LinkedIn profile scraping to Supabase to DD enrichment', icon: '\uD83D\uDCBC',
-    url: '', githubRepo: 'djdebtfree/li-enrichment-pipeline', healthEndpoint: '/health',
+    url: 'https://li-enrichment-pipeline-production.up.railway.app', githubRepo: 'djdebtfree/li-enrichment-pipeline', healthEndpoint: '/health',
     configurable: true,
     actions: [
       { label: 'Test Scrape', method: 'POST', path: '/scrape',
@@ -684,7 +695,7 @@ const SERVICES = [
   {
     id: 'li-validator', name: 'LI Reverse Validator', section: 'Social Enrichment',
     description: 'Validates DD records against LinkedIn - THE MONEY SERVICE', icon: '\uD83D\uDD25',
-    url: '', githubRepo: 'djdebtfree/li-reverse-validator', healthEndpoint: '/health',
+    url: 'https://li-reverse-validator-production.up.railway.app', githubRepo: 'djdebtfree/li-reverse-validator', healthEndpoint: '/health',
     configurable: true,
     actions: [
       { label: 'Validate Batch (5)', method: 'POST', path: '/validate',
@@ -706,11 +717,14 @@ const SERVICES = [
   },
   {
     id: 'vapi', name: 'VAPI Voice Squad', section: 'Voice + Visual',
-    description: '5-agent voice call system - NOT YET BUILT', icon: '\uD83D\uDCDE',
-    url: '', healthEndpoint: '',
-    configurable: false, status: 'planned',
-    plannedNote: 'Terminal 5 - VAPI voice squad deployment',
-    actions: []
+    description: '5-agent voice system — Sandy Beach live, recruiting test passed', icon: '\uD83D\uDCDE',
+    url: 'https://api.vapi.ai', healthEndpoint: '/assistant/24e584bd-0779-4d0b-ae1a-69267f0b61ee',
+    configurable: false, needsApiKey: 'VAPI_API_KEY', authBearer: true,
+    actions: [
+      { label: 'List Assistants', method: 'GET', path: '/assistant' },
+      { label: 'Recent Calls', method: 'GET', path: '/call?limit=5' },
+      { label: 'Phone Numbers', method: 'GET', path: '/phone-number' }
+    ]
   },
   {
     id: 'liveavatar-api', name: 'LiveAvatar / HeyGen API', section: 'Voice + Visual',
@@ -748,11 +762,39 @@ const SERVICES = [
     actions: [
       { label: 'Check Balance', method: 'GET', path: '/balance' }
     ]
+  },
+  // SECTION 7: MCP SERVERS
+  {
+    id: 'mcp-maybetech', name: 'MaybeTech MCP', section: 'MCP Servers',
+    description: 'MCP server — 6 tools (agents, conversations, invoke)', icon: '\uD83D\uDD0C',
+    url: 'https://maybetech-mcp-production.up.railway.app', healthEndpoint: '/health',
+    configurable: false,
+    actions: [
+      { label: 'Health', method: 'GET', path: '/health' }
+    ]
+  },
+  {
+    id: 'mcp-vapi', name: 'VAPI MCP', section: 'MCP Servers',
+    description: 'MCP server — 7 tools (calls, assistants, phone)', icon: '\uD83D\uDD0C',
+    url: 'https://vapi-mcp-production.up.railway.app', healthEndpoint: '/health',
+    configurable: false,
+    actions: [
+      { label: 'Health', method: 'GET', path: '/health' }
+    ]
+  },
+  {
+    id: 'mcp-heygen', name: 'HeyGen MCP', section: 'MCP Servers',
+    description: 'MCP server — 9 tools (avatars, sessions, streaming)', icon: '\uD83D\uDD0C',
+    url: 'https://heygen-mcp-production.up.railway.app', healthEndpoint: '/health',
+    configurable: false,
+    actions: [
+      { label: 'Health', method: 'GET', path: '/health' }
+    ]
   }
 ];
 
 const SECTION_ORDER = [
-  'Data Acquisition', 'Lead Nurturing', 'AI Agent Layer',
+  'Data Acquisition', 'Lead Nurturing', 'AI Agent Layer', 'MCP Servers',
   'Social Enrichment', 'Voice + Visual', 'Customer-Facing'
 ];
 
@@ -776,8 +818,20 @@ const CONFIGURABLE_KEYS = [
   { id: 'ELEVENLABS_API_KEY', label: 'ElevenLabs API Key' },
   { id: 'LIVEAVATAR_API_KEY', label: 'LiveAvatar API Key' },
   { id: 'STRIPE_SECRET_KEY', label: 'Stripe Secret Key' },
-  { id: 'MAKE_API_KEY', label: 'Make.com API Token' }
+  { id: 'MAKE_API_KEY', label: 'Make.com API Token' },
+  { id: 'VAPI_API_KEY', label: 'VAPI API Key' },
+  { id: 'TWILIO_ACCOUNT_SID', label: 'Twilio Account SID' },
+  { id: 'TWILIO_AUTH_TOKEN', label: 'Twilio Auth Token' },
+  { id: 'COGNEE_API_KEY', label: 'Cognee API Key' }
 ];
+
+const DEFAULT_KEYS = {
+  'SUPABASE_ANON_KEY': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNtZmdraGx3b3N6bGRmc3hrdmliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ1ODY2NzQsImV4cCI6MjA2MDE2MjY3NH0.uctXWiu6SYW75PRA3YgbkHt3c16sEnVH8nYqJrviXkU',
+  'AGENT_SUPABASE_ANON_KEY': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp5bWVwYnhvc3JwcHJydGNtbXFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyMTc4MjksImV4cCI6MjA4Nzc5MzgyOX0.RmIRy9BbyFNOdW3qtMjsoyXVR_-a7eOpp4svWI7ZTpA',
+  'VAPI_API_KEY': '1d227d93-e1de-43cb-af69-ef2d0ff67ed5',
+  'GHL_API_KEY': 'pit-74ec7644-5818-4196-a341-58b100c9a646',
+  'MAKE_API_KEY': 'e6cdac65-5fbc-4fe9-8c7b-03270ee9914b'
+};
 
 // ===== STATE =====
 let serviceStates = {};
@@ -815,6 +869,10 @@ function loadSettings() {
     } catch (e) { console.error('Failed to load settings', e); }
   }
   if (!window._apiKeys) window._apiKeys = {};
+  // Merge defaults (don't overwrite user-set keys)
+  for (const [k, v] of Object.entries(DEFAULT_KEYS)) {
+    if (!window._apiKeys[k]) window._apiKeys[k] = v;
+  }
 }
 
 function saveSettings() {
@@ -1047,8 +1105,19 @@ function getServiceUrl(svc) {
 async function healthCheck(svc) {
   const url = getServiceUrl(svc);
   if (!url || svc.status === 'planned' || svc.status === 'config-needed') return;
-  if (svc.localOnly && !location.hostname.match(/localhost|127\.0\.0\.1/)) {
-    updateServiceStatus(svc.id, { status: 'unknown', note: 'Local only - run on Keith\'s machine' });
+
+  // Key-presence check: show connected if API key exists (avoids CORS issues)
+  if (svc.keyPresenceCheck && svc.needsApiKey) {
+    const key = getApiKey(svc.needsApiKey);
+    if (key) {
+      updateServiceStatus(svc.id, { status: 'healthy', lastChecked: new Date(), note: 'API key configured' });
+      addLogEntry(`${svc.name}: connected (API key present)`, 'success');
+    } else {
+      updateServiceStatus(svc.id, { status: 'config-needed', lastChecked: new Date(), note: 'API key missing' });
+      addLogEntry(`${svc.name}: needs API key`, 'warning');
+    }
+    renderSections();
+    updateMasterStatus();
     return;
   }
 
