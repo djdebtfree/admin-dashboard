@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Driver Pro — System Setup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #000000;
+  --text: #FFFFFF;
+  --text-muted: #AAAAAA;
+  --accent-blue: #007BFF;
+  --accent-yellow: #F5FF00;
+  --gradient: linear-gradient(135deg, #007BFF, #F5FF00);
+  --healthy: #00FF88;
+  --unhealthy: #FF4444;
+  --unknown: #666666;
+  --card-bg: #111111;
+  --card-border: #222222;
+  --card-hover: #1a1a1a;
+  --font: 'Montserrat', sans-serif;
+}
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ===== HEADER ===== */
+.header {
+  padding: 20px 30px;
+  border-bottom: 1px solid var(--card-border);
+  position: sticky;
+  top: 0;
+  background: rgba(0,0,0,0.95);
+  backdrop-filter: blur(10px);
+  z-index: 100;
+}
+
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.header-title {
+  font-size: 22px;
+  font-weight: 800;
+  background: var(--gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.5px;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn {
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px 16px;
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  background: var(--card-bg);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.15s;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn:hover { border-color: var(--accent-blue); background: #1a1a2a; }
+.btn-primary {
+  background: var(--accent-blue);
+  border-color: var(--accent-blue);
+  color: #fff;
+}
+.btn-primary:hover { background: #0069d9; }
+.btn-secondary {
+  background: transparent;
+  border-color: var(--accent-yellow);
+  color: var(--accent-yellow);
+}
+.btn-secondary:hover { background: rgba(245,255,0,0.08); }
+
+/* ===== MAIN ===== */
+.main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 32px 30px 80px;
+}
+
+.page-subtitle {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 32px;
+  line-height: 1.5;
+}
+
+/* ===== SECTION ===== */
+.config-section {
+  margin-bottom: 32px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  cursor: pointer;
+  user-select: none;
+  border-bottom: 1px solid var(--card-border);
+  transition: background 0.15s;
+}
+.section-header:hover { background: var(--card-hover); }
+
+.section-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-icon { font-size: 20px; }
+
+.section-title {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.section-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: rgba(0,123,255,0.15);
+  color: var(--accent-blue);
+}
+
+.section-toggle {
+  font-size: 14px;
+  color: var(--accent-blue);
+  transition: transform 0.2s;
+}
+.section-header.collapsed .section-toggle { transform: rotate(-90deg); }
+
+.section-body {
+  padding: 20px;
+}
+.section-header.collapsed + .section-body { display: none; }
+
+/* ===== FIELD ROW ===== */
+.field-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.field-row:last-child { margin-bottom: 0; }
+
+.field-status {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+.field-status.has-value { color: var(--healthy); }
+.field-status.no-value { color: var(--unhealthy); }
+
+.field-label {
+  width: 240px;
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.3px;
+}
+
+.field-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.field-input input,
+.field-input textarea {
+  width: 100%;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  padding: 8px 12px;
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  background: #0a0a0a;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s;
+}
+.field-input input:focus,
+.field-input textarea:focus {
+  border-color: var(--accent-blue);
+}
+.field-input input[readonly],
+.field-input textarea[readonly] {
+  background: #0d0d0d;
+  color: var(--text-muted);
+  cursor: default;
+  border-color: #1a1a1a;
+}
+.field-input textarea {
+  resize: vertical;
+  min-height: 80px;
+  line-height: 1.4;
+}
+
+.field-readonly-tag {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--unknown);
+  background: rgba(102,102,102,0.15);
+  padding: 2px 6px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+/* ===== ACTION BAR ===== */
+.action-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0,0,0,0.95);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--card-border);
+  padding: 14px 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  z-index: 100;
+}
+
+/* ===== TOAST ===== */
+.toast {
+  position: fixed;
+  top: 80px;
+  right: 30px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font);
+  z-index: 200;
+  opacity: 0;
+  transform: translateX(30px);
+  transition: all 0.3s;
+  pointer-events: none;
+}
+.toast.show {
+  opacity: 1;
+  transform: translateX(0);
+}
+.toast.success {
+  background: rgba(0,255,136,0.12);
+  border: 1px solid var(--healthy);
+  color: var(--healthy);
+}
+.toast.error {
+  background: rgba(255,68,68,0.12);
+  border: 1px solid var(--unhealthy);
+  color: var(--unhealthy);
+}
+.toast.info {
+  background: rgba(0,123,255,0.12);
+  border: 1px solid var(--accent-blue);
+  color: var(--accent-blue);
+}
+
+/* ===== ENV MODAL ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.8);
+  backdrop-filter: blur(4px);
+  z-index: 300;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.modal-overlay.show { display: flex; }
+
+.modal {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  width: 90%;
+  max-width: 700px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.modal-title {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px;
+}
+.modal-close:hover { color: var(--text); }
+
+.modal-body {
+  padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.modal-body textarea {
+  width: 100%;
+  min-height: 400px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  padding: 16px;
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  background: #0a0a0a;
+  color: var(--healthy);
+  resize: vertical;
+  outline: none;
+}
+
+.modal-footer {
+  padding: 14px 20px;
+  border-top: 1px solid var(--card-border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* ===== LOADING ===== */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 250;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 16px;
+}
+.loading-overlay.show { display: flex; }
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--card-border);
+  border-top-color: var(--accent-blue);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loading-text {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .field-row { flex-wrap: wrap; }
+  .field-label { width: 100%; }
+  .main { padding: 20px 16px 80px; }
+  .header { padding: 16px; }
+  .action-bar { padding: 12px 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-top">
+    <div class="header-title">DATA DRIVER PRO — System Setup</div>
+    <div class="header-controls">
+      <a href="/" class="btn">&#8592; Dashboard</a>
+    </div>
+  </div>
+</header>
+
+<!-- MAIN -->
+<div class="main">
+  <p class="page-subtitle">
+    Configure all credentials and API keys for the Data Driver Pro system. Values are stored in Supabase
+    (<code style="color:var(--accent-blue)">dd_system_config</code>) and can be exported as Railway environment variables.
+  </p>
+
+  <!-- Sections will be rendered by JS -->
+  <div id="sectionsContainer"></div>
+</div>
+
+<!-- ACTION BAR -->
+<div class="action-bar">
+  <button class="btn btn-primary" onclick="saveAll()" id="btnSave">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+    Save All
+  </button>
+  <button class="btn btn-secondary" onclick="showEnvModal()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+    Generate Railway Env
+  </button>
+</div>
+
+<!-- ENV MODAL -->
+<div class="modal-overlay" id="envModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Railway Environment Variables</div>
+      <button class="modal-close" onclick="closeEnvModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <textarea id="envOutput" readonly></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="copyEnv()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Copy to Clipboard
+      </button>
+      <button class="btn" onclick="closeEnvModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOADING OVERLAY -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <div class="loading-text" id="loadingText">Loading configuration...</div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== SUPABASE CONFIG =====
+const SUPABASE_URL = 'https://zymepbxosrpprrtcmmqi.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp5bWVwYnhvc3JwcHJydGNtbXFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyMTc4MjksImV4cCI6MjA4Nzc5MzgyOX0.RmIRy9BbyFNOdW3qtMjsoyXVR_-a7eOpp4svWI7ZTpA';
+const TABLE = 'dd_system_config';
+
+// ===== FIELD DEFINITIONS =====
+const SECTIONS = [
+  {
+    id: 'ghl',
+    icon: '\uD83D\uDCDE',
+    title: 'GoHighLevel (GHL)',
+    fields: [
+      { key: 'GHL_CLIENT_ID', type: 'text', label: 'GHL_CLIENT_ID' },
+      { key: 'GHL_CLIENT_SECRET', type: 'password', label: 'GHL_CLIENT_SECRET' },
+      { key: 'GHL_APP_ID', type: 'text', label: 'GHL_APP_ID' },
+      { key: 'GHL_DD_LOCATION_ID', type: 'text', label: 'GHL_DD_LOCATION_ID' },
+      { key: 'GHL_DD_COMPANY_ID', type: 'text', label: 'GHL_DD_COMPANY_ID' },
+      { key: 'GHL_WEBHOOK_PUBLIC_KEY', type: 'textarea', label: 'GHL_WEBHOOK_PUBLIC_KEY' },
+      { key: 'GHL_PIT_TOKEN', type: 'password', label: 'GHL_PIT_TOKEN' },
+    ]
+  },
+  {
+    id: 'stripe',
+    icon: '\uD83D\uDCB3',
+    title: 'Stripe',
+    fields: [
+      { key: 'STRIPE_PRICE_PRO', type: 'text', label: 'STRIPE_PRICE_PRO', readonly: true, default: 'price_1TEBKdAlROxZG9iH5xWksrrS' },
+      { key: 'STRIPE_PRICE_PROPLUS', type: 'text', label: 'STRIPE_PRICE_PROPLUS', readonly: true, default: 'price_1TEBKeAlROxZG9iHMy5f0l7C' },
+      { key: 'STRIPE_PRICE_MONTHLY', type: 'text', label: 'STRIPE_PRICE_MONTHLY', readonly: true, default: 'price_1TEBKfAlROxZG9iHytJYH4Lz' },
+      { key: 'STRIPE_SECRET_KEY', type: 'password', label: 'STRIPE_SECRET_KEY' },
+      { key: 'STRIPE_WEBHOOK_SECRET', type: 'password', label: 'STRIPE_WEBHOOK_SECRET' },
+    ]
+  },
+  {
+    id: 'supabase',
+    icon: '\uD83D\uDDC4\uFE0F',
+    title: 'Supabase',
+    fields: [
+      { key: 'SUPABASE_URL', type: 'text', label: 'SUPABASE_URL', readonly: true, default: 'https://smfgkhlwoszldfsxkvib.supabase.co' },
+      { key: 'SUPABASE_SERVICE_KEY', type: 'password', label: 'SUPABASE_SERVICE_KEY' },
+      { key: 'SUPABASE_ANON_KEY', type: 'password', label: 'SUPABASE_ANON_KEY' },
+      { key: 'PL_SUPABASE_URL', type: 'text', label: 'PL_SUPABASE_URL', readonly: true, default: 'https://zymepbxosrpprrtcmmqi.supabase.co' },
+      { key: 'PL_SUPABASE_SERVICE_KEY', type: 'password', label: 'PL_SUPABASE_SERVICE_KEY' },
+      { key: 'PL_SUPABASE_ANON_KEY', type: 'password', label: 'PL_SUPABASE_ANON_KEY', default: SUPABASE_ANON_KEY },
+    ]
+  },
+  {
+    id: 'maybetech',
+    icon: '\uD83E\uDD16',
+    title: 'MaybeTech',
+    fields: [
+      { key: 'MAYBETECH_API_KEY', type: 'password', label: 'MAYBETECH_API_KEY' },
+      { key: 'MAYBETECH_AGENCY_ID', type: 'text', label: 'MAYBETECH_AGENCY_ID', readonly: true, default: '68bfd52b8092a533be939cf3' },
+    ]
+  },
+  {
+    id: 'vapi',
+    icon: '\uD83C\uDF99\uFE0F',
+    title: 'VAPI',
+    fields: [
+      { key: 'VAPI_API_KEY', type: 'password', label: 'VAPI_API_KEY' },
+    ]
+  },
+  {
+    id: 'heygen',
+    icon: '\uD83C\uDFAC',
+    title: 'HeyGen',
+    fields: [
+      { key: 'HEYGEN_API_KEY', type: 'password', label: 'HEYGEN_API_KEY' },
+    ]
+  },
+  {
+    id: 'elevenlabs',
+    icon: '\uD83D\uDD0A',
+    title: 'ElevenLabs',
+    fields: [
+      { key: 'ELEVENLABS_API_KEY', type: 'password', label: 'ELEVENLABS_API_KEY' },
+    ]
+  },
+  {
+    id: 'apify',
+    icon: '\uD83D\uDD77\uFE0F',
+    title: 'Apify',
+    fields: [
+      { key: 'APIFY_TOKEN', type: 'password', label: 'APIFY_TOKEN' },
+    ]
+  },
+  {
+    id: 'phantombuster',
+    icon: '\uD83D\uDC7B',
+    title: 'PhantomBuster',
+    fields: [
+      { key: 'PHANTOMBUSTER_API_KEY', type: 'password', label: 'PHANTOMBUSTER_API_KEY' },
+    ]
+  }
+];
+
+// ===== STATE =====
+let configData = {}; // key -> value from Supabase
+
+// ===== SUPABASE API =====
+async function fetchConfig() {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?select=*`, {
+    headers: {
+      'apikey': SUPABASE_ANON_KEY,
+      'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+    }
+  });
+  if (!res.ok) throw new Error(`Failed to fetch config: ${res.status}`);
+  const rows = await res.json();
+  const data = {};
+  for (const row of rows) {
+    if (row.key && row.value !== undefined && row.value !== null) {
+      data[row.key] = row.value;
+    }
+  }
+  return data;
+}
+
+async function upsertConfig(entries) {
+  // entries = [{ key, value, category }]
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}`, {
+    method: 'POST',
+    headers: {
+      'apikey': SUPABASE_ANON_KEY,
+      'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': 'resolution=merge-duplicates',
+    },
+    body: JSON.stringify(entries),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Failed to save config: ${res.status} — ${text}`);
+  }
+}
+
+// ===== RENDER =====
+function renderSections() {
+  const container = document.getElementById('sectionsContainer');
+  container.innerHTML = '';
+
+  for (const section of SECTIONS) {
+    const filledCount = section.fields.filter(f => getFieldValue(f)).length;
+    const totalCount = section.fields.length;
+
+    const sectionEl = document.createElement('div');
+    sectionEl.className = 'config-section';
+    sectionEl.innerHTML = `
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-left">
+          <span class="section-icon">${section.icon}</span>
+          <span class="section-title">${section.title}</span>
+          <span class="section-badge">${filledCount}/${totalCount}</span>
+        </div>
+        <span class="section-toggle">\u25BC</span>
+      </div>
+      <div class="section-body">
+        ${section.fields.map(f => renderField(f, section.id)).join('')}
+      </div>
+    `;
+    container.appendChild(sectionEl);
+  }
+}
+
+function getFieldValue(field) {
+  return configData[field.key] || field.default || '';
+}
+
+function renderField(field, sectionId) {
+  const value = getFieldValue(field);
+  const hasValue = !!value;
+  const statusIcon = hasValue
+    ? '<span class="field-status has-value">\u2713</span>'
+    : '<span class="field-status no-value">\u2717</span>';
+
+  const readonlyAttr = field.readonly ? 'readonly' : '';
+  const readonlyTag = field.readonly ? '<span class="field-readonly-tag">Fixed</span>' : '';
+
+  let inputHtml;
+  if (field.type === 'textarea') {
+    inputHtml = `<div class="field-input"><textarea id="field-${field.key}" ${readonlyAttr} placeholder="Paste ${field.key} here...">${escapeHtml(value)}</textarea></div>`;
+  } else {
+    inputHtml = `<div class="field-input"><input type="${field.type}" id="field-${field.key}" value="${escapeAttr(value)}" ${readonlyAttr} placeholder="${field.readonly ? '' : 'Enter ' + field.key + '...'}"></div>`;
+  }
+
+  return `
+    <div class="field-row">
+      ${statusIcon}
+      <div class="field-label">${field.label}</div>
+      ${inputHtml}
+      ${readonlyTag}
+    </div>
+  `;
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function escapeAttr(str) {
+  return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// ===== ACTIONS =====
+function toggleSection(headerEl) {
+  headerEl.classList.toggle('collapsed');
+}
+
+async function saveAll() {
+  const btn = document.getElementById('btnSave');
+  btn.disabled = true;
+  showLoading('Saving configuration...');
+
+  try {
+    const entries = [];
+    for (const section of SECTIONS) {
+      for (const field of section.fields) {
+        const el = document.getElementById(`field-${field.key}`);
+        if (!el) continue;
+        const val = el.value.trim();
+        if (val) {
+          entries.push({
+            key: field.key,
+            value: val,
+            category: section.id,
+            updated_at: new Date().toISOString(),
+          });
+        }
+      }
+    }
+
+    if (entries.length === 0) {
+      showToast('No values to save', 'error');
+      return;
+    }
+
+    await upsertConfig(entries);
+
+    // Refresh local state
+    configData = await fetchConfig();
+    renderSections();
+
+    showToast(`Saved ${entries.length} config values`, 'success');
+  } catch (err) {
+    console.error(err);
+    showToast(`Save failed: ${err.message}`, 'error');
+  } finally {
+    hideLoading();
+    btn.disabled = false;
+  }
+}
+
+function showEnvModal() {
+  const lines = [];
+  for (const section of SECTIONS) {
+    lines.push(`# === ${section.title.toUpperCase()} ===`);
+    for (const field of section.fields) {
+      const el = document.getElementById(`field-${field.key}`);
+      const val = el ? el.value.trim() : (field.default || '');
+      if (val) {
+        // Wrap in quotes if value contains special chars
+        const needsQuotes = /[\s='"#\\]/.test(val) || val.includes('\n');
+        if (val.includes('\n')) {
+          // Multiline: use escaped format
+          lines.push(`${field.key}="${val.replace(/\n/g, '\\n').replace(/"/g, '\\"')}"`);
+        } else if (needsQuotes) {
+          lines.push(`${field.key}="${val.replace(/"/g, '\\"')}"`);
+        } else {
+          lines.push(`${field.key}=${val}`);
+        }
+      } else {
+        lines.push(`# ${field.key}=  (not set)`);
+      }
+    }
+    lines.push('');
+  }
+
+  document.getElementById('envOutput').value = lines.join('\n');
+  document.getElementById('envModal').classList.add('show');
+}
+
+function closeEnvModal() {
+  document.getElementById('envModal').classList.remove('show');
+}
+
+async function copyEnv() {
+  const text = document.getElementById('envOutput').value;
+  try {
+    await navigator.clipboard.writeText(text);
+    showToast('Copied to clipboard', 'success');
+  } catch {
+    // Fallback
+    document.getElementById('envOutput').select();
+    document.execCommand('copy');
+    showToast('Copied to clipboard', 'success');
+  }
+}
+
+// ===== UI HELPERS =====
+function showToast(msg, type = 'info') {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.className = `toast ${type} show`;
+  setTimeout(() => { toast.classList.remove('show'); }, 3500);
+}
+
+function showLoading(text) {
+  document.getElementById('loadingText').textContent = text;
+  document.getElementById('loadingOverlay').classList.add('show');
+}
+
+function hideLoading() {
+  document.getElementById('loadingOverlay').classList.remove('show');
+}
+
+// ===== INIT =====
+async function init() {
+  showLoading('Loading configuration from Supabase...');
+  try {
+    configData = await fetchConfig();
+    renderSections();
+    const totalFields = SECTIONS.reduce((s, sec) => s + sec.fields.length, 0);
+    const filledFields = Object.keys(configData).length;
+    showToast(`Loaded ${filledFields} values from config`, 'info');
+  } catch (err) {
+    console.error(err);
+    // Even if fetch fails (table may not exist yet), render empty form
+    renderSections();
+    showToast('Could not load config — table may not exist yet', 'error');
+  } finally {
+    hideLoading();
+  }
+}
+
+init();
+</script>
+</body>
+</html>
