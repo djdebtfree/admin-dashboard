@@ -198,6 +198,8 @@ body {
 .card.unhealthy::before { background: var(--unhealthy); }
 .card.not-deployed::before { background: var(--not-deployed); }
 .card.planned::before { background: var(--planned); }
+.card.timeout::before { background: var(--not-deployed); }
+.card.error::before { background: var(--unhealthy); }
 .card.config-needed::before { background: var(--config-needed); }
 
 .card-head {
@@ -231,6 +233,8 @@ body {
 .status-dot.checking { background: var(--accent-yellow); animation: pulse 1s infinite; }
 .status-dot.planned { background: var(--planned); }
 .status-dot.config-needed { background: var(--config-needed); }
+.status-dot.timeout { background: var(--not-deployed); animation: pulse 1.5s infinite; }
+.status-dot.error { background: var(--unhealthy); }
 
 @keyframes pulse {
   0%, 100% { opacity: 1; }
@@ -251,6 +255,8 @@ body {
 .card-status.checking { color: var(--accent-yellow); }
 .card-status.planned { color: var(--planned); }
 .card-status.config-needed { color: var(--config-needed); }
+.card-status.timeout { color: var(--not-deployed); }
+.card-status.error { color: var(--unhealthy); }
 
 .card-meta {
   font-size: 10px;
@@ -536,20 +542,21 @@ body {
 
 <script>
 // ===== SERVICE REGISTRY =====
+// All health checks are proxied server-side via Netlify Functions to avoid CORS.
 const SERVICES = [
   // SECTION 1: DATA ACQUISITION
   {
-    id: 'dd-api', name: 'Data Driver API Gateway', section: 'Data Acquisition',
+    id: 'dd-api', name: 'DD API Gateway', section: 'Data Acquisition',
     description: 'Core data API - contacts, metadata, exports', icon: '\u26A1',
-    url: 'https://datadriverapi.com', healthEndpoint: '/api/v1/health',
+    url: 'https://datadriverapi.com', healthEndpoint: '/health',
     configurable: false,
     actions: [
-      { label: 'Health Check', method: 'GET', path: '/api/v1/health' },
+      { label: 'Health Check', method: 'GET', path: '/health' },
       { label: 'Meta Summary', method: 'GET', path: '/meta/summary' }
     ]
   },
   {
-    id: 'dd-supabase', name: 'Data Driver DB', section: 'Data Acquisition',
+    id: 'dd-supabase', name: 'DD Contact DB', section: 'Data Acquisition',
     description: 'Verified contact storage (Supabase)', icon: '\uD83D\uDDC4\uFE0F',
     url: 'https://smfgkhlwoszldfsxkvib.supabase.co', healthEndpoint: '/rest/v1/',
     configurable: false, needsApiKey: 'SUPABASE_ANON_KEY',
@@ -561,7 +568,7 @@ const SERVICES = [
     id: 'audiencelab', name: 'AudienceLab Builder', section: 'Data Acquisition',
     description: 'Audience creation, export, clean, push to Supabase', icon: '\uD83C\uDFAF',
     url: 'https://audiencelab-builder-production.up.railway.app', githubRepo: 'djdebtfree/audiencelab-builder', healthEndpoint: '/health',
-    configurable: true,
+    configurable: true, railwayService: true,
     actions: [
       { label: 'Test Build', method: 'POST', path: '/build-audience',
         body: { audience_name: 'Test MVP', audience_type: 'keyword', intent_keywords: ['insurance'], filters: { state: 'FL', city: 'Tampa' } } },
@@ -570,7 +577,7 @@ const SERVICES = [
     ]
   },
   {
-    id: 'apify', name: 'Apify Account', section: 'Data Acquisition',
+    id: 'apify', name: 'Apify', section: 'Data Acquisition',
     description: 'Web scraping platform - actors for FB + LI', icon: '\uD83D\uDD77\uFE0F',
     url: 'https://api.apify.com/v2', healthEndpoint: '/acts?limit=1',
     configurable: false, needsApiKey: 'APIFY_TOKEN', tokenParam: 'token',
@@ -589,20 +596,19 @@ const SERVICES = [
   },
   // SECTION 2: LEAD NURTURING
   {
-    id: 'ghl', name: 'GoHighLevel CRM', section: 'Lead Nurturing',
+    id: 'ghl', name: 'GHL CRM', section: 'Lead Nurturing',
     description: 'CRM + workflow engine - GHL Marketplace app', icon: '\uD83D\uDCCB',
-    url: 'https://services.leadconnectorhq.com', healthEndpoint: '',
+    url: 'https://services.leadconnectorhq.com', healthEndpoint: '/contacts/?locationId=LjgmqjZskwMKTIcGOnvM&limit=1',
     configurable: false, needsApiKey: 'GHL_API_KEY', authBearer: true,
     extraHeaders: { 'Version': '2021-07-28' },
-    keyPresenceCheck: true,
     actions: [
       { label: 'Test Contacts API', method: 'GET', path: '/contacts/?locationId=LjgmqjZskwMKTIcGOnvM&limit=1' }
     ]
   },
   {
-    id: 'twilio', name: 'Twilio', section: 'Lead Nurturing',
-    description: 'SMS + Voice delivery — Account SID AC4295...', icon: '\uD83D\uDCF1',
-    url: 'https://api.vapi.ai', healthEndpoint: '/phone-number/37fd52ef-5345-400b-8471-e01f4ff839d0',
+    id: 'vapi-voice', name: 'VAPI Voice', section: 'Lead Nurturing',
+    description: 'Voice AI platform - calls, phone numbers, assistants', icon: '\uD83D\uDCF1',
+    url: 'https://api.vapi.ai', healthEndpoint: '/call?limit=1',
     needsApiKey: 'VAPI_API_KEY', authBearer: true,
     configurable: false,
     actions: [
@@ -613,9 +619,9 @@ const SERVICES = [
   {
     id: 'make', name: 'Make (Workflows)', section: 'Lead Nurturing',
     description: 'Workflow orchestration — AJF Financial Group, Core plan', icon: '\u2699\uFE0F',
-    url: 'https://us1.make.com', healthEndpoint: '/api/v2/organizations',
+    url: 'https://us1.make.com', healthEndpoint: '/api/v2/scenarios?pg[limit]=1',
     needsApiKey: 'MAKE_API_KEY', authToken: true,
-    configurable: true,
+    configurable: false,
     actions: [
       { label: 'List Scenarios', method: 'GET', path: '/api/v2/scenarios?pg[limit]=10&pg[sortBy]=name' }
     ]
@@ -625,7 +631,7 @@ const SERVICES = [
     id: 'liveavatar', name: 'LiveAvatar SDK Agent', section: 'AI Agent Layer',
     description: 'Sandy Beach avatar - visitor recognition + GHL CRM logging', icon: '\uD83C\uDFAD',
     url: 'https://liveavatar-ghl-agent-production.up.railway.app', githubRepo: 'djdebtfree/liveavatar-sdk-agent', healthEndpoint: '/health',
-    configurable: true,
+    configurable: true, railwayService: true,
     actions: [
       { label: 'Test Session', method: 'POST', path: '/session/start', body: {} },
       { label: 'GHL Lookup', method: 'GET', path: '/api/contact/lookup?query=test@test.com' },
@@ -633,16 +639,16 @@ const SERVICES = [
     ]
   },
   {
-    id: 'sandy-sms', name: 'Sandy Beach SMS Agent', section: 'AI Agent Layer',
+    id: 'sandy-sms', name: 'Sandy SMS Agent', section: 'AI Agent Layer',
     description: 'SMS/email follow-up automation via GHL', icon: '\uD83D\uDCAC',
     url: 'https://sandy-sms-agent-production.up.railway.app', githubRepo: 'djdebtfree/sandy-sms-agent', healthEndpoint: '/health',
-    configurable: true,
+    configurable: true, railwayService: true,
     actions: [
       { label: 'View Status', method: 'GET', path: '/status' }
     ]
   },
   {
-    id: 'agent-supabase', name: 'Pipeline Lite Agent DB', section: 'AI Agent Layer',
+    id: 'agent-supabase', name: 'PL Agent DB', section: 'AI Agent Layer',
     description: 'Agent state + outcomes (Supabase)', icon: '\uD83E\uDDE0',
     url: 'https://zymepbxosrpprrtcmmqi.supabase.co', healthEndpoint: '/rest/v1/',
     configurable: false, needsApiKey: 'AGENT_SUPABASE_ANON_KEY',
@@ -651,29 +657,57 @@ const SERVICES = [
     ]
   },
   {
-    id: 'qclaw', name: 'QClaw Knowledge Graph', section: 'AI Agent Layer',
+    id: 'qclaw', name: 'QClaw', section: 'AI Agent Layer',
     description: 'Agent runtime + knowledge graph (Railway)', icon: '\uD83E\uDD9E',
-    url: 'https://qclaw-salessuiteos-production.up.railway.app', healthEndpoint: '/',
-    configurable: false,
+    url: 'https://qclaw-salessuiteos-production.up.railway.app', healthEndpoint: '/health',
+    configurable: false, railwayService: true,
     actions: [
-      { label: 'Health', method: 'GET', path: '/api/health' }
+      { label: 'Health', method: 'GET', path: '/health' }
     ]
   },
   {
     id: 'cognee', name: 'Cognee Cloud', section: 'AI Agent Layer',
     description: 'Knowledge graph — Cognee Cloud (AWS tenant)', icon: '\uD83E\uDDE0',
-    url: 'https://tenant-3bb8cb97-03c7-484b-988d-36840c96edca.aws.cognee.ai', healthEndpoint: '/api/health',
+    url: 'https://tenant-3bb8cb97-03c7-484b-988d-36840c96edca.aws.cognee.ai', healthEndpoint: '/health',
     configurable: false,
     actions: [
-      { label: 'Health', method: 'GET', path: '/api/health' }
+      { label: 'Health', method: 'GET', path: '/health' }
     ]
   },
-  // SECTION 4: SOCIAL ENRICHMENT
+  // SECTION 4: MCP SERVERS
   {
-    id: 'fb-pipeline', name: 'FB Enrichment Pipeline', section: 'Social Enrichment',
+    id: 'mcp-maybetech', name: 'MaybeTech MCP', section: 'MCP Servers',
+    description: 'MCP server — 6 tools (agents, conversations, invoke)', icon: '\uD83D\uDD0C',
+    url: 'https://maybetech-mcp-production.up.railway.app', healthEndpoint: '/health',
+    configurable: false, railwayService: true,
+    actions: [
+      { label: 'Health', method: 'GET', path: '/health' }
+    ]
+  },
+  {
+    id: 'mcp-vapi', name: 'VAPI MCP', section: 'MCP Servers',
+    description: 'MCP server — 7 tools (calls, assistants, phone)', icon: '\uD83D\uDD0C',
+    url: 'https://vapi-mcp-production.up.railway.app', healthEndpoint: '/health',
+    configurable: false, railwayService: true,
+    actions: [
+      { label: 'Health', method: 'GET', path: '/health' }
+    ]
+  },
+  {
+    id: 'mcp-heygen', name: 'HeyGen MCP', section: 'MCP Servers',
+    description: 'MCP server — 9 tools (avatars, sessions, streaming)', icon: '\uD83D\uDD0C',
+    url: 'https://heygen-mcp-production.up.railway.app', healthEndpoint: '/health',
+    configurable: false, railwayService: true,
+    actions: [
+      { label: 'Health', method: 'GET', path: '/health' }
+    ]
+  },
+  // SECTION 5: SOCIAL ENRICHMENT
+  {
+    id: 'fb-pipeline', name: 'FB Enrichment', section: 'Social Enrichment',
     description: 'Facebook profile scraping to Supabase to DD enrichment', icon: '\uD83D\uDCD8',
     url: 'https://fb-enrichment-pipeline-production.up.railway.app', githubRepo: 'djdebtfree/fb-enrichment-pipeline', healthEndpoint: '/health',
-    configurable: true,
+    configurable: true, railwayService: true,
     actions: [
       { label: 'Test Scrape (5)', method: 'POST', path: '/scrape',
         body: { actor: 'search', query: 'insurance agents Florida', maxProfiles: 5 } },
@@ -682,10 +716,10 @@ const SERVICES = [
     ]
   },
   {
-    id: 'li-pipeline', name: 'LI Enrichment Pipeline', section: 'Social Enrichment',
+    id: 'li-pipeline', name: 'LI Enrichment', section: 'Social Enrichment',
     description: 'LinkedIn profile scraping to Supabase to DD enrichment', icon: '\uD83D\uDCBC',
     url: 'https://li-enrichment-pipeline-production.up.railway.app', githubRepo: 'djdebtfree/li-enrichment-pipeline', healthEndpoint: '/health',
-    configurable: true,
+    configurable: true, railwayService: true,
     actions: [
       { label: 'Test Scrape', method: 'POST', path: '/scrape',
         body: { actor: 'search', query: 'insurance agents', maxProfiles: 5 } },
@@ -697,7 +731,7 @@ const SERVICES = [
     id: 'li-validator', name: 'LI Reverse Validator', section: 'Social Enrichment',
     description: 'Validates DD records against LinkedIn - THE MONEY SERVICE', icon: '\uD83D\uDD25',
     url: 'https://li-reverse-validator-production.up.railway.app', githubRepo: 'djdebtfree/li-reverse-validator', healthEndpoint: '/health',
-    configurable: true,
+    configurable: true, railwayService: true,
     actions: [
       { label: 'Validate Batch (5)', method: 'POST', path: '/validate',
         body: { table: 'Insurance CRM Seekers', batchSize: 5 } },
@@ -705,7 +739,7 @@ const SERVICES = [
       { label: 'View Status', method: 'GET', path: '/status' }
     ]
   },
-  // SECTION 5: VOICE + VISUAL
+  // SECTION 6: VOICE + VISUAL
   {
     id: 'elevenlabs', name: 'ElevenLabs', section: 'Voice + Visual',
     description: 'Voice synthesis for Sandy Beach', icon: '\uD83D\uDD0A',
@@ -719,7 +753,7 @@ const SERVICES = [
   {
     id: 'vapi', name: 'VAPI Voice Squad', section: 'Voice + Visual',
     description: '5-agent voice system — Sandy Beach live, recruiting test passed', icon: '\uD83D\uDCDE',
-    url: 'https://api.vapi.ai', healthEndpoint: '/assistant/24e584bd-0779-4d0b-ae1a-69267f0b61ee',
+    url: 'https://api.vapi.ai', healthEndpoint: '/assistant?limit=1',
     configurable: false, needsApiKey: 'VAPI_API_KEY', authBearer: true,
     actions: [
       { label: 'List Assistants', method: 'GET', path: '/assistant' },
@@ -728,7 +762,7 @@ const SERVICES = [
     ]
   },
   {
-    id: 'liveavatar-api', name: 'LiveAvatar / HeyGen API', section: 'Voice + Visual',
+    id: 'liveavatar-api', name: 'LiveAvatar / HeyGen', section: 'Voice + Visual',
     description: 'Avatar streaming - June preset', icon: '\uD83C\uDFAC',
     url: 'https://api.liveavatar.com/v1', healthEndpoint: '/avatars',
     configurable: false, needsApiKey: 'LIVEAVATAR_API_KEY', headerKey: 'X-API-KEY',
@@ -736,7 +770,7 @@ const SERVICES = [
       { label: 'List Avatars', method: 'GET', path: '/avatars' }
     ]
   },
-  // SECTION 6: CUSTOMER-FACING
+  // SECTION 7: CUSTOMER-FACING
   {
     id: 'trydatadriver', name: 'trydatadriver.com', section: 'Customer-Facing',
     description: 'Data Driver landing page (Lovable/React SPA)', icon: '\uD83C\uDF10',
@@ -763,40 +797,12 @@ const SERVICES = [
     actions: [
       { label: 'Check Balance', method: 'GET', path: '/balance' }
     ]
-  },
-  // SECTION 7: MCP SERVERS
-  {
-    id: 'mcp-maybetech', name: 'MaybeTech MCP', section: 'MCP Servers',
-    description: 'MCP server — 6 tools (agents, conversations, invoke)', icon: '\uD83D\uDD0C',
-    url: 'https://maybetech-mcp-production.up.railway.app', healthEndpoint: '/health',
-    configurable: false,
-    actions: [
-      { label: 'Health', method: 'GET', path: '/health' }
-    ]
-  },
-  {
-    id: 'mcp-vapi', name: 'VAPI MCP', section: 'MCP Servers',
-    description: 'MCP server — 7 tools (calls, assistants, phone)', icon: '\uD83D\uDD0C',
-    url: 'https://vapi-mcp-production.up.railway.app', healthEndpoint: '/health',
-    configurable: false,
-    actions: [
-      { label: 'Health', method: 'GET', path: '/health' }
-    ]
-  },
-  {
-    id: 'mcp-heygen', name: 'HeyGen MCP', section: 'MCP Servers',
-    description: 'MCP server — 9 tools (avatars, sessions, streaming)', icon: '\uD83D\uDD0C',
-    url: 'https://heygen-mcp-production.up.railway.app', healthEndpoint: '/health',
-    configurable: false,
-    actions: [
-      { label: 'Health', method: 'GET', path: '/health' }
-    ]
   }
 ];
 
 const SECTION_ORDER = [
-  'Data Acquisition', 'Lead Nurturing', 'AI Agent Layer', 'MCP Servers',
-  'Social Enrichment', 'Voice + Visual', 'Customer-Facing'
+  'Data Acquisition', 'Lead Nurturing', 'AI Agent Layer',
+  'MCP Servers', 'Social Enrichment', 'Voice + Visual', 'Customer-Facing'
 ];
 
 const CONFIGURABLE_URLS = [
@@ -821,8 +827,6 @@ const CONFIGURABLE_KEYS = [
   { id: 'STRIPE_SECRET_KEY', label: 'Stripe Secret Key' },
   { id: 'MAKE_API_KEY', label: 'Make.com API Token' },
   { id: 'VAPI_API_KEY', label: 'VAPI API Key' },
-  { id: 'TWILIO_ACCOUNT_SID', label: 'Twilio Account SID' },
-  { id: 'TWILIO_AUTH_TOKEN', label: 'Twilio Auth Token' },
   { id: 'COGNEE_API_KEY', label: 'Cognee API Key' }
 ];
 
@@ -1144,9 +1148,8 @@ function getStatusLabel(status, state) {
     case 'planned': return 'PLANNED';
     case 'config-needed': return 'CONFIG NEEDED';
     case 'checking': return 'CHECKING...';
-    case 'timeout': return 'TIMEOUT';
-    case 'error': return 'ERROR';
-    case 'cors-blocked': return 'ALIVE (CORS blocked)';
+    case 'timeout': return 'TIMEOUT (service may be sleeping)';
+    case 'error': return 'ERROR' + (state.error ? `: ${state.error.substring(0, 60)}` : '');
     default: return 'UNKNOWN';
   }
 }
@@ -1156,20 +1159,22 @@ function getServiceUrl(svc) {
 }
 
 // ===== HEALTH CHECKS =====
+// All checks go through the Netlify serverless proxy to eliminate CORS issues.
+const HEALTH_PROXY = '/.netlify/functions/health-proxy';
+const ACTION_PROXY = '/.netlify/functions/action-proxy';
+
 async function healthCheck(svc) {
   const url = getServiceUrl(svc);
   if (!url || svc.status === 'planned' || svc.status === 'config-needed') return;
 
-  // Key-presence check: show connected if API key exists (avoids CORS issues)
-  if (svc.keyPresenceCheck && svc.needsApiKey) {
-    const key = getApiKey(svc.needsApiKey);
-    if (key) {
-      updateServiceStatus(svc.id, { status: 'healthy', lastChecked: new Date(), note: 'API key configured' });
-      addLogEntry(`${svc.name}: connected (API key present)`, 'success');
-    } else {
-      updateServiceStatus(svc.id, { status: 'config-needed', lastChecked: new Date(), note: 'API key missing' });
-      addLogEntry(`${svc.name}: needs API key`, 'warning');
-    }
+  // If the service needs an API key and none is configured, show config-needed
+  if (svc.needsApiKey && !getApiKey(svc.needsApiKey)) {
+    updateServiceStatus(svc.id, {
+      status: 'config-needed',
+      lastChecked: new Date(),
+      note: `Missing API key: ${svc.needsApiKey}`
+    });
+    addLogEntry(`${svc.name}: needs API key (${svc.needsApiKey})`, 'warning');
     renderSections();
     updateMasterStatus();
     return;
@@ -1178,60 +1183,79 @@ async function healthCheck(svc) {
   updateServiceStatus(svc.id, { status: 'checking' });
   renderSections();
 
-  const fullUrl = url + svc.healthEndpoint;
+  const fullUrl = buildHealthUrl(svc);
   const method = svc.healthMethod || 'GET';
   const headers = buildHeaders(svc);
+  // Railway services may be sleeping — give them 15s to wake
+  const timeout = svc.railwayService ? 15000 : 12000;
 
-  let finalUrl = fullUrl;
+  try {
+    const response = await fetch(HEALTH_PROXY, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: fullUrl, method, headers, timeout })
+    });
+    const result = await response.json();
+
+    if (result.status === 'healthy') {
+      updateServiceStatus(svc.id, {
+        status: 'healthy',
+        statusCode: result.statusCode,
+        responseTime: result.responseTime,
+        lastChecked: new Date()
+      });
+      addLogEntry(`${svc.name}: healthy ${result.statusCode} (${result.responseTime}ms)`, 'success');
+    } else if (result.status === 'timeout') {
+      updateServiceStatus(svc.id, {
+        status: 'timeout',
+        responseTime: result.responseTime,
+        lastChecked: new Date(),
+        error: result.error || 'Request timed out'
+      });
+      addLogEntry(`${svc.name}: TIMEOUT after ${result.responseTime}ms`, 'error');
+    } else if (result.status === 'error') {
+      updateServiceStatus(svc.id, {
+        status: 'error',
+        lastChecked: new Date(),
+        error: result.error || 'Connection failed'
+      });
+      addLogEntry(`${svc.name}: ERROR - ${result.error}`, 'error');
+    } else {
+      // unhealthy (non-2xx)
+      updateServiceStatus(svc.id, {
+        status: 'unhealthy',
+        statusCode: result.statusCode,
+        responseTime: result.responseTime,
+        lastChecked: new Date()
+      });
+      addLogEntry(`${svc.name}: unhealthy ${result.statusCode} (${result.responseTime}ms)`, 'error');
+    }
+  } catch (proxyErr) {
+    // The proxy itself failed (unlikely unless Netlify is down)
+    updateServiceStatus(svc.id, {
+      status: 'error',
+      lastChecked: new Date(),
+      error: 'Proxy error: ' + proxyErr.message
+    });
+    addLogEntry(`${svc.name}: PROXY ERROR - ${proxyErr.message}`, 'error');
+  }
+
+  renderSections();
+  updateMasterStatus();
+}
+
+function buildHealthUrl(svc) {
+  const url = getServiceUrl(svc);
+  let fullUrl = url + svc.healthEndpoint;
   // Handle token-in-URL services like Apify
   if (svc.needsApiKey && svc.tokenParam) {
     const key = getApiKey(svc.needsApiKey);
     if (key) {
-      const sep = finalUrl.includes('?') ? '&' : '?';
-      finalUrl += `${sep}${svc.tokenParam}=${key}`;
+      const sep = fullUrl.includes('?') ? '&' : '?';
+      fullUrl += `${sep}${svc.tokenParam}=${key}`;
     }
   }
-
-  try {
-    const start = Date.now();
-    const response = await fetch(finalUrl, {
-      method,
-      headers,
-      signal: AbortSignal.timeout(10000)
-    });
-    const elapsed = Date.now() - start;
-    updateServiceStatus(svc.id, {
-      status: response.ok ? 'healthy' : 'unhealthy',
-      statusCode: response.status,
-      responseTime: elapsed,
-      lastChecked: new Date()
-    });
-    addLogEntry(`${svc.name}: health check ${response.status} (${elapsed}ms)`,
-      response.ok ? 'success' : 'error');
-  } catch (e) {
-    // CORS fallback: try no-cors
-    try {
-      const start = Date.now();
-      await fetch(finalUrl, { method, mode: 'no-cors', signal: AbortSignal.timeout(10000) });
-      const elapsed = Date.now() - start;
-      updateServiceStatus(svc.id, {
-        status: 'cors-blocked',
-        responseTime: elapsed,
-        lastChecked: new Date(),
-        note: 'Server responded but CORS blocked body'
-      });
-      addLogEntry(`${svc.name}: alive but CORS blocked (${elapsed}ms)`, 'warning');
-    } catch (e2) {
-      updateServiceStatus(svc.id, {
-        status: e.name === 'TimeoutError' ? 'timeout' : 'error',
-        error: e.message,
-        lastChecked: new Date()
-      });
-      addLogEntry(`${svc.name}: ${e.name === 'TimeoutError' ? 'TIMEOUT' : 'ERROR'} - ${e.message}`, 'error');
-    }
-  }
-  renderSections();
-  updateMasterStatus();
+  return fullUrl;
 }
 
 function buildHeaders(svc) {
@@ -1261,11 +1285,15 @@ function getApiKey(keyName) {
 }
 
 async function refreshAll() {
-  addLogEntry('Starting full refresh...', 'info');
-  const promises = SERVICES.map(svc => healthCheck(svc));
-  await Promise.allSettled(promises);
+  addLogEntry('Starting full refresh of ' + SERVICES.length + ' services...', 'info');
+  // Run checks in batches of 5 to avoid overwhelming the proxy
+  const batchSize = 5;
+  for (let i = 0; i < SERVICES.length; i += batchSize) {
+    const batch = SERVICES.slice(i, i + batchSize);
+    await Promise.allSettled(batch.map(svc => healthCheck(svc)));
+  }
   updateMasterStatus();
-  addLogEntry(`Refresh complete: ${countHealthy()} services responding`, 'info');
+  addLogEntry(`Refresh complete: ${countHealthy()}/${SERVICES.length} services healthy`, 'info');
 }
 
 function updateServiceStatus(id, state) {
@@ -1284,7 +1312,7 @@ function updateMasterStatus() {
 function countHealthy() {
   return SERVICES.filter(s => {
     const st = serviceStates[s.id];
-    return st && (st.status === 'healthy' || st.status === 'cors-blocked');
+    return st && st.status === 'healthy';
   }).length;
 }
 
@@ -1319,44 +1347,44 @@ async function executeAction(serviceId, actionIndex) {
     }
   }
 
+  const actionUrl = url + fullPath;
+  const method = action.method || 'GET';
+  const headers = { ...buildHeaders(svc), 'Content-Type': 'application/json' };
+  const reqBody = (action.body && ['POST', 'PUT', 'PATCH'].includes(method)) ? action.body : undefined;
+  const timeout = svc.railwayService ? 30000 : 25000;
+
   try {
-    const start = Date.now();
-    const options = {
-      method: action.method || 'GET',
-      headers: { ...buildHeaders(svc), 'Content-Type': 'application/json' },
-      signal: AbortSignal.timeout(30000)
-    };
-    if (action.body && (action.method === 'POST' || action.method === 'PUT')) {
-      options.body = JSON.stringify(action.body);
-    }
-
-    const response = await fetch(url + fullPath, options);
-    const elapsed = Date.now() - start;
-
-    let data;
-    const ct = response.headers.get('content-type') || '';
-    if (ct.includes('json')) {
-      data = await response.json();
-    } else {
-      data = await response.text();
-    }
-
-    showActionResult(serviceId, {
-      action: action.label,
-      status: response.status,
-      time: elapsed,
-      data
+    const response = await fetch(ACTION_PROXY, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: actionUrl, method, headers, body: reqBody, timeout })
     });
-    addLogEntry(`${svc.name}: ${action.label} \u2192 ${response.status} (${elapsed}ms)`,
-      response.ok ? 'success' : 'error');
+    const result = await response.json();
 
+    if (result.error) {
+      showActionResult(serviceId, {
+        action: action.label,
+        status: 'ERROR',
+        error: result.error
+      });
+      addLogEntry(`${svc.name}: ${action.label} -> FAILED: ${result.error}`, 'error');
+    } else {
+      showActionResult(serviceId, {
+        action: action.label,
+        status: result.statusCode,
+        time: result.responseTime,
+        data: result.data
+      });
+      addLogEntry(`${svc.name}: ${action.label} -> ${result.statusCode} (${result.responseTime}ms)`,
+        result.ok ? 'success' : 'error');
+    }
   } catch (err) {
     showActionResult(serviceId, {
       action: action.label,
       status: 'ERROR',
-      error: err.message
+      error: 'Proxy error: ' + err.message
     });
-    addLogEntry(`${svc.name}: ${action.label} \u2192 FAILED: ${err.message}`, 'error');
+    addLogEntry(`${svc.name}: ${action.label} -> PROXY ERROR: ${err.message}`, 'error');
   } finally {
     btn.disabled = false;
     btn.classList.remove('running');
