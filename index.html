@@ -480,6 +480,7 @@ body {
       <span class="header-status" id="masterStatus"><span id="healthyCount">0</span>/<span id="totalCount">25</span> services healthy</span>
       <button class="btn" id="btnSettings" onclick="toggleSettings()">Settings</button>
       <button class="btn" id="btnAutoRefresh" onclick="toggleAutoRefresh()">Auto-refresh: ON</button>
+      <button class="btn" onclick="loadRemoteConfig().then(() => { renderSections(); refreshAll(); })">Sync Keys</button>
       <button class="btn" onclick="refreshAll()">Refresh All</button>
     </div>
   </div>
@@ -825,6 +826,8 @@ const CONFIGURABLE_KEYS = [
   { id: 'COGNEE_API_KEY', label: 'Cognee API Key' }
 ];
 
+const CONFIG_API_URL = 'https://ddpro-config-api-production.up.railway.app';
+
 const DEFAULT_KEYS = {
   'SUPABASE_ANON_KEY': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNtZmdraGx3b3N6bGRmc3hrdmliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ1ODY2NzQsImV4cCI6MjA2MDE2MjY3NH0.uctXWiu6SYW75PRA3YgbkHt3c16sEnVH8nYqJrviXkU',
   'AGENT_SUPABASE_ANON_KEY': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp5bWVwYnhvc3JwcHJydGNtbXFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyMTc4MjksImV4cCI6MjA4Nzc5MzgyOX0.RmIRy9BbyFNOdW3qtMjsoyXVR_-a7eOpp4svWI7ZTpA',
@@ -840,9 +843,11 @@ let autoRefreshTimer = null;
 let logEntries = [];
 
 // ===== INIT =====
-function init() {
+async function init() {
   loadSettings();
   renderSettingsPanel();
+  renderSections();
+  await loadRemoteConfig();
   renderSections();
   startAutoRefresh();
   addLogEntry('Dashboard initialized. Starting health checks...', 'info');
@@ -872,6 +877,55 @@ function loadSettings() {
   // Merge defaults (don't overwrite user-set keys)
   for (const [k, v] of Object.entries(DEFAULT_KEYS)) {
     if (!window._apiKeys[k]) window._apiKeys[k] = v;
+  }
+}
+
+async function loadRemoteConfig() {
+  const token = localStorage.getItem('ddpro-auth-token');
+  if (!token) {
+    promptForAuth();
+    return;
+  }
+  try {
+    const res = await fetch(CONFIG_API_URL + '/config', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    if (res.status === 401) {
+      localStorage.removeItem('ddpro-auth-token');
+      promptForAuth();
+      return;
+    }
+    if (!res.ok) throw new Error('Config API error: ' + res.status);
+    const data = await res.json();
+    // Apply URLs
+    if (data.urls) {
+      for (const [id, url] of Object.entries(data.urls)) {
+        const svc = SERVICES.find(s => s.id === id);
+        if (svc && url) svc.url = url;
+      }
+    }
+    // Apply keys (merge, don't overwrite local)
+    if (data.keys) {
+      for (const [k, v] of Object.entries(data.keys)) {
+        if (v && !window._apiKeys[k]) window._apiKeys[k] = v;
+      }
+    }
+    // Save to localStorage as cache
+    localStorage.setItem('ddpro-settings', JSON.stringify({ urls: data.urls, keys: data.keys }));
+    addLogEntry('Config loaded from remote API', 'success');
+  } catch (err) {
+    addLogEntry('Remote config failed: ' + err.message + ' — using cached settings', 'warning');
+  }
+}
+
+function promptForAuth() {
+  const token = prompt('Enter Data Driver Pro admin password:');
+  if (token) {
+    localStorage.setItem('ddpro-auth-token', token);
+    loadRemoteConfig().then(() => {
+      renderSections();
+      refreshAll();
+    });
   }
 }
 
