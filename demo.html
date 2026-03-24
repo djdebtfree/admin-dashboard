@@ -13,19 +13,19 @@
 :root {
   --bg: #000000;
   --text: #FFFFFF;
-  --text-muted: #AAAAAA;
+  --text-muted: #888888;
   --text-dim: #666666;
-  --accent-blue: #007BFF;
-  --accent-yellow: #F5FF00;
-  --gradient: linear-gradient(135deg, #007BFF, #F5FF00);
-  --gradient-reverse: linear-gradient(135deg, #F5FF00, #007BFF);
-  --healthy: #00FF88;
-  --card-bg: #111111;
-  --card-border: #222222;
+  --accent-blue: #00E5FF;
+  --accent-yellow: #FACC15;
+  --gradient: linear-gradient(135deg, #00E5FF, #4ADE80, #FACC15);
+  --gradient-reverse: linear-gradient(135deg, #FACC15, #4ADE80, #00E5FF);
+  --healthy: #4ADE80;
+  --card-bg: #0a0a0a;
+  --card-border: #1a1a1a;
   --card-hover: #1a1a1a;
   --font: 'Montserrat', sans-serif;
-  --glow-blue: rgba(0,123,255,0.3);
-  --glow-yellow: rgba(245,255,0,0.2);
+  --glow-blue: rgba(0,229,255,0.3);
+  --glow-yellow: rgba(250,204,21,0.2);
 }
 
 html { scroll-behavior: smooth; }
@@ -101,7 +101,7 @@ body {
   text-transform: uppercase;
 }
 .header-nav a:hover { color: var(--text); border-color: var(--card-border); background: var(--card-bg); }
-.header-nav a.active { color: var(--accent-blue); border-color: var(--accent-blue); background: rgba(0,123,255,0.08); }
+.header-nav a.active { color: var(--accent-blue); border-color: var(--accent-blue); background: rgba(0,229,255,0.08); }
 
 .btn {
   font-family: var(--font);
@@ -119,13 +119,13 @@ body {
   align-items: center;
   gap: 6px;
 }
-.btn:hover { border-color: var(--accent-blue); background: #1a1a2a; }
+.btn:hover { border-color: var(--accent-blue); background: #0a1a1a; }
 .btn-primary {
   background: var(--accent-blue);
   border-color: var(--accent-blue);
   color: #fff;
 }
-.btn-primary:hover { background: #0069d9; transform: translateY(-1px); box-shadow: 0 4px 20px var(--glow-blue); }
+.btn-primary:hover { background: #00b8cc; transform: translateY(-1px); box-shadow: 0 4px 20px var(--glow-blue); }
 .btn-cta {
   background: var(--gradient);
   border: none;
@@ -154,8 +154,8 @@ body {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 80% 60% at 50% 40%, rgba(0,123,255,0.08) 0%, transparent 70%),
-    radial-gradient(ellipse 60% 40% at 70% 60%, rgba(245,255,0,0.04) 0%, transparent 60%);
+    radial-gradient(ellipse 80% 60% at 50% 40%, rgba(0,229,255,0.08) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 40% at 70% 60%, rgba(250,204,21,0.04) 0%, transparent 60%);
   pointer-events: none;
 }
 
@@ -308,6 +308,10 @@ body {
   line-height: 1.15;
   letter-spacing: -1px;
   margin-bottom: 16px;
+  background: linear-gradient(135deg, #00E5FF, #4ADE80, #FACC15);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .section-desc {
@@ -344,13 +348,13 @@ body {
   z-index: 2;
 }
 .arch-node:hover {
-  border-color: var(--accent-blue);
+  border-color: #00E5FF;
   transform: scale(1.03);
-  box-shadow: 0 0 40px var(--glow-blue);
+  box-shadow: 0 0 40px var(--glow-blue), 0 0 20px rgba(74,222,128,0.15);
 }
 .arch-node.active {
-  border-color: var(--accent-blue);
-  box-shadow: 0 0 40px var(--glow-blue);
+  border-color: #00E5FF;
+  box-shadow: 0 0 40px var(--glow-blue), 0 0 20px rgba(74,222,128,0.15);
 }
 
 .arch-node-icon {
@@ -383,7 +387,7 @@ body {
   top: 0;
   width: 2px;
   height: 100%;
-  background: linear-gradient(180deg, var(--accent-blue), transparent);
+  background: linear-gradient(180deg, #00E5FF, #4ADE80, transparent);
   animation: connectorPulse 2s ease-in-out infinite;
 }
 .arch-connector::after {
@@ -394,8 +398,8 @@ body {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--accent-blue);
-  box-shadow: 0 0 12px var(--accent-blue);
+  background: #00E5FF;
+  box-shadow: 0 0 12px #00E5FF;
   animation: nodePulse 2s ease-in-out infinite;
 }
 
@@ -437,7 +441,7 @@ body {
   left: 12.5%;
   right: 12.5%;
   height: 2px;
-  background: linear-gradient(90deg, transparent, var(--accent-blue), var(--accent-blue), transparent);
+  background: linear-gradient(90deg, transparent, #00E5FF, #4ADE80, #FACC15, transparent);
   animation: connectorPulse 2s ease-in-out infinite;
 }
 .arch-branch-connectors .branch-drop {
@@ -445,7 +449,7 @@ body {
   top: 0;
   width: 2px;
   height: 100%;
-  background: linear-gradient(180deg, var(--accent-blue), transparent);
+  background: linear-gradient(180deg, #00E5FF, #4ADE80, transparent);
   animation: connectorPulse 2s ease-in-out infinite;
 }
 .arch-branch-connectors .branch-drop:nth-child(1) { left: 12.5%; }
@@ -548,8 +552,8 @@ body {
   justify-content: center;
   font-size: 24px;
   margin-bottom: 16px;
-  background: rgba(0,123,255,0.08);
-  border: 1px solid rgba(0,123,255,0.15);
+  background: rgba(0,229,255,0.08);
+  border: 1px solid rgba(0,229,255,0.15);
 }
 
 .feature-title {
@@ -721,7 +725,7 @@ body {
   background: transparent;
   color: var(--text);
 }
-.pricing-btn-outline:hover { border-color: var(--accent-blue); background: rgba(0,123,255,0.08); }
+.pricing-btn-outline:hover { border-color: var(--accent-blue); background: rgba(0,229,255,0.08); }
 .pricing-btn-primary {
   background: var(--gradient);
   color: #000;
@@ -898,7 +902,7 @@ body {
   transition: all 0.2s;
   backdrop-filter: blur(10px);
 }
-.slide-btn:hover { border-color: var(--accent-blue); background: rgba(0,123,255,0.15); }
+.slide-btn:hover { border-color: var(--accent-blue); background: rgba(0,229,255,0.15); }
 
 .slide-dots {
   display: flex;
@@ -1070,6 +1074,7 @@ body {
   <div class="hero-bg"></div>
   <div class="hero-grid"></div>
   <div class="hero-content">
+    <img src="/dd-logo.png" height="60" alt="DataDriver Logo" style="display:block;margin:0 auto 24px;">
     <div class="hero-badge">
       <span class="dot"></span>
       Available on GHL Marketplace
@@ -1385,6 +1390,7 @@ body {
       <!-- SLIDE 1: Title -->
       <div class="slide active" data-slide="0">
         <div class="slide-number">01 / 10</div>
+        <img src="/dd-logo.png" height="60" alt="DataDriver Logo" style="margin-bottom:16px;">
         <div class="slide-icon">&#9889;</div>
         <h2><span class="gradient-text">DataDriver Pro</span></h2>
         <p>The Future of AI Sales &amp; Recruiting Automation for GoHighLevel</p>
