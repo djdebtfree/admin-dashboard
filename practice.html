@@ -868,6 +868,265 @@ body {
   .steps-grid { grid-template-columns: 1fr; }
   .persona-badges { flex-direction: column; align-items: center; }
   .persona-badge { width: 100%; max-width: 280px; }
+  .scenario-grid { grid-template-columns: 1fr !important; }
+}
+
+/* ===== STATS BAR ===== */
+.stats-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 32px;
+}
+.stat-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  padding: 18px 20px;
+  text-align: center;
+  transition: border-color 0.2s;
+}
+.stat-card:hover { border-color: var(--accent-blue); }
+.stat-value {
+  font-size: 32px;
+  font-weight: 800;
+  background: var(--gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.2;
+}
+.stat-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 4px;
+}
+@media (max-width: 700px) {
+  .stats-bar { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 480px) {
+  .stats-bar { grid-template-columns: 1fr; }
+}
+
+/* ===== SCENARIO MODE ===== */
+.scenario-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+}
+@media (max-width: 900px) {
+  .scenario-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 700px) {
+  .scenario-grid { grid-template-columns: repeat(2, 1fr); }
+}
+.scenario-card {
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 22px 18px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: default;
+}
+.scenario-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+}
+.scenario-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+
+.scenario-card[data-color="red"] { border: 1px solid rgba(239,68,68,0.3); }
+.scenario-card[data-color="red"]::before { background: var(--accent-red); }
+.scenario-card[data-color="yellow"] { border: 1px solid rgba(250,204,21,0.3); }
+.scenario-card[data-color="yellow"]::before { background: var(--accent-yellow); }
+.scenario-card[data-color="green"] { border: 1px solid rgba(74,222,128,0.3); }
+.scenario-card[data-color="green"]::before { background: var(--accent-green); }
+.scenario-card[data-color="cyan"] { border: 1px solid rgba(0,229,255,0.3); }
+.scenario-card[data-color="cyan"]::before { background: var(--accent-blue); }
+.scenario-card[data-color="gradient"] { border: 1px solid rgba(168,85,247,0.3); }
+.scenario-card[data-color="gradient"]::before { background: var(--gradient); }
+
+.scenario-icon { font-size: 28px; margin-bottom: 10px; }
+.scenario-name {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.scenario-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: 14px;
+}
+.scenario-btn {
+  font-family: var(--font);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 7px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.scenario-card[data-color="red"] .scenario-btn { background: rgba(239,68,68,0.15); color: var(--accent-red); }
+.scenario-card[data-color="red"] .scenario-btn:hover { background: rgba(239,68,68,0.25); }
+.scenario-card[data-color="yellow"] .scenario-btn { background: rgba(250,204,21,0.15); color: var(--accent-yellow); }
+.scenario-card[data-color="yellow"] .scenario-btn:hover { background: rgba(250,204,21,0.25); }
+.scenario-card[data-color="green"] .scenario-btn { background: rgba(74,222,128,0.15); color: var(--accent-green); }
+.scenario-card[data-color="green"] .scenario-btn:hover { background: rgba(74,222,128,0.25); }
+.scenario-card[data-color="cyan"] .scenario-btn { background: rgba(0,229,255,0.15); color: var(--accent-blue); }
+.scenario-card[data-color="cyan"] .scenario-btn:hover { background: rgba(0,229,255,0.25); }
+.scenario-card[data-color="gradient"] .scenario-btn { background: var(--gradient); color: #000; }
+.scenario-card[data-color="gradient"] .scenario-btn:hover { opacity: 0.9; }
+
+.scenario-status {
+  margin-top: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent-green);
+  display: none;
+}
+.scenario-status.active { display: block; }
+
+/* Scenario phone modal */
+.phone-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+}
+.phone-modal-overlay.open { display: flex; }
+.phone-modal {
+  background: var(--bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: 32px;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+.phone-modal-title {
+  font-size: 18px;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+.phone-modal-desc {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+}
+.phone-modal-input {
+  font-family: var(--font);
+  font-size: 16px;
+  font-weight: 600;
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  background: #050505;
+  color: var(--text);
+  text-align: center;
+  margin-bottom: 16px;
+}
+.phone-modal-input:focus { outline: none; border-color: var(--accent-blue); }
+.phone-modal-actions { display: flex; gap: 10px; justify-content: center; }
+.phone-modal-cancel {
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 20px;
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.phone-modal-cancel:hover { border-color: var(--text-muted); color: var(--text); }
+
+/* ===== LEADERBOARD ===== */
+.leaderboard-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 8px;
+}
+.leaderboard-table th {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  padding: 0 12px 8px;
+  text-align: left;
+  border-bottom: 1px solid var(--card-border);
+}
+.leaderboard-table th:nth-child(1) { width: 50px; text-align: center; }
+.leaderboard-table th:last-child { text-align: center; }
+
+.leaderboard-table td {
+  padding: 14px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  background: var(--card-bg);
+  border-top: 1px solid var(--card-border);
+  border-bottom: 1px solid var(--card-border);
+}
+.leaderboard-table tr td:first-child {
+  border-left: 1px solid var(--card-border);
+  border-radius: 8px 0 0 8px;
+  text-align: center;
+}
+.leaderboard-table tr td:last-child {
+  border-right: 1px solid var(--card-border);
+  border-radius: 0 8px 8px 0;
+  text-align: center;
+}
+
+.leaderboard-table tr:hover td { border-color: var(--accent-blue); }
+
+.rank-cell {
+  font-size: 16px;
+  font-weight: 800;
+}
+.rank-1 { color: #FFD700; text-shadow: 0 0 8px rgba(255,215,0,0.4); }
+.rank-2 { color: #C0C0C0; text-shadow: 0 0 8px rgba(192,192,192,0.4); }
+.rank-3 { color: #CD7F32; text-shadow: 0 0 8px rgba(205,127,50,0.4); }
+
+.rep-name { font-weight: 700; }
+
+.badge-cell {
+  font-size: 16px;
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.score-highlight {
+  font-weight: 800;
+}
+.score-highlight.high { color: var(--accent-green); }
+.score-highlight.mid { color: var(--accent-yellow); }
+.score-highlight.low { color: var(--accent-red); }
+
+.streak-value { color: var(--accent-yellow); font-weight: 700; }
+.time-value { color: var(--text-muted); font-size: 12px; }
+
+@media (max-width: 700px) {
+  .leaderboard-table { font-size: 11px; }
+  .leaderboard-table th, .leaderboard-table td { padding: 10px 8px; }
+  .badge-cell { font-size: 13px; }
 }
 </style>
 </head>
@@ -891,6 +1150,26 @@ body {
 
 <!-- ===== MAIN ===== -->
 <div class="main">
+
+  <!-- ===== STATS BAR ===== -->
+  <div class="stats-bar" id="statsBar">
+    <div class="stat-card">
+      <div class="stat-value" id="statSessions">--</div>
+      <div class="stat-label">Total Sessions</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="statAvgScore">--</div>
+      <div class="stat-label">Avg Team Score</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="statStreaks">--</div>
+      <div class="stat-label">Active Streaks</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="statBestScore">--</div>
+      <div class="stat-label">Best Score Ever</div>
+    </div>
+  </div>
 
   <!-- ===== SECTION 1: CALL TO PRACTICE ===== -->
   <div class="section">
@@ -946,6 +1225,48 @@ body {
     </div>
   </div>
 
+  <!-- ===== SCENARIO MODE ===== -->
+  <div class="section">
+    <div class="section-title">Scenario Mode</div>
+    <div class="scenario-grid">
+      <div class="scenario-card" data-color="red" data-scenario="objection_gauntlet">
+        <div class="scenario-icon">&#9876;&#65039;</div>
+        <div class="scenario-name">Objection Gauntlet</div>
+        <div class="scenario-desc">Nothing but objections. Master the ADR framework.</div>
+        <button class="scenario-btn" onclick="startScenario('objection_gauntlet', this)">Start Scenario</button>
+        <div class="scenario-status" id="status-objection_gauntlet"></div>
+      </div>
+      <div class="scenario-card" data-color="yellow" data-scenario="appointment_closer">
+        <div class="scenario-icon">&#128197;</div>
+        <div class="scenario-name">Appointment Closer</div>
+        <div class="scenario-desc">Get the appointment set. Tie it down and lock it.</div>
+        <button class="scenario-btn" onclick="startScenario('appointment_closer', this)">Start Scenario</button>
+        <div class="scenario-status" id="status-appointment_closer"></div>
+      </div>
+      <div class="scenario-card" data-color="green" data-scenario="kitchen_table">
+        <div class="scenario-icon">&#127968;</div>
+        <div class="scenario-name">Kitchen Table</div>
+        <div class="scenario-desc">Full 12-step presentation. Close the deal.</div>
+        <button class="scenario-btn" onclick="startScenario('kitchen_table', this)">Start Scenario</button>
+        <div class="scenario-status" id="status-kitchen_table"></div>
+      </div>
+      <div class="scenario-card" data-color="cyan" data-scenario="recruiter_call">
+        <div class="scenario-icon">&#129309;</div>
+        <div class="scenario-name">Recruiter Call</div>
+        <div class="scenario-desc">Candidate outreach. Ethical, consent-based.</div>
+        <button class="scenario-btn" onclick="startScenario('recruiter_call', this)">Start Scenario</button>
+        <div class="scenario-status" id="status-recruiter_call"></div>
+      </div>
+      <div class="scenario-card" data-color="gradient" data-scenario="full_random">
+        <div class="scenario-icon">&#127922;</div>
+        <div class="scenario-name">Full Random</div>
+        <div class="scenario-desc">Standard random persona. The full experience.</div>
+        <button class="scenario-btn" onclick="startScenario('full_random', this)">Start Scenario</button>
+        <div class="scenario-status" id="status-full_random"></div>
+      </div>
+    </div>
+  </div>
+
   <!-- ===== SECTION 2: UPLOAD SCRIPT ===== -->
   <div class="section">
     <div class="section-title">Upload Script</div>
@@ -994,6 +1315,17 @@ body {
     </div>
   </div>
 
+  <!-- ===== LEADERBOARD ===== -->
+  <div class="section">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <div class="section-title" style="margin-bottom:0;">Leaderboard</div>
+      <button class="btn-sm" onclick="loadLeaderboard()">Refresh</button>
+    </div>
+    <div id="leaderboardContainer">
+      <div class="empty-state"><span class="spinner"></span> Loading leaderboard...</div>
+    </div>
+  </div>
+
   <!-- ===== SECTION 5: HOW IT WORKS ===== -->
   <div class="section">
     <div class="section-title">How It Works</div>
@@ -1025,6 +1357,19 @@ body {
   </div>
 
 </div><!-- end .main -->
+
+<!-- ===== SCENARIO PHONE MODAL ===== -->
+<div class="phone-modal-overlay" id="phoneModal">
+  <div class="phone-modal">
+    <div class="phone-modal-title">Enter Your Phone Number</div>
+    <div class="phone-modal-desc" id="phoneModalDesc">We'll call you to start the scenario.</div>
+    <input type="tel" class="phone-modal-input" id="phoneModalInput" placeholder="+1 (555) 123-4567">
+    <div class="phone-modal-actions">
+      <button class="phone-modal-cancel" onclick="closePhoneModal()">Cancel</button>
+      <button class="btn-primary" id="phoneModalSubmit" onclick="submitScenarioCall()">Call Me</button>
+    </div>
+  </div>
+</div>
 
 <!-- ===== COACHING REPORT MODAL ===== -->
 <div class="modal-overlay" id="reportModal">
@@ -1393,10 +1738,214 @@ function toCamel(str) {
   return str.replace(/_([a-z])/g, (_, c) => c.toUpperCase());
 }
 
+// ===== STATS BAR =====
+function updateStatsFromLeaderboard(entries) {
+  if (!entries || !entries.length) return;
+  let totalSessions = 0;
+  let totalScore = 0;
+  let scoreCount = 0;
+  let activeStreaks = 0;
+  let bestScore = 0;
+
+  entries.forEach(e => {
+    const sess = e.sessions || e.session_count || e.total_sessions || 0;
+    const avg = e.avg_score || e.avgScore || e.average_score || 0;
+    const best = e.best_score || e.bestScore || e.top_score || 0;
+    const streak = e.streak || e.current_streak || 0;
+
+    totalSessions += sess;
+    if (avg > 0) { totalScore += avg; scoreCount++; }
+    if (streak > 0) activeStreaks++;
+    if (best > bestScore) bestScore = best;
+  });
+
+  const avgTeam = scoreCount > 0 ? Math.round(totalScore / scoreCount) : 0;
+
+  document.getElementById('statSessions').textContent = totalSessions;
+  document.getElementById('statAvgScore').textContent = avgTeam;
+  document.getElementById('statStreaks').textContent = activeStreaks;
+  document.getElementById('statBestScore').textContent = bestScore;
+}
+
+// ===== LEADERBOARD =====
+const BADGE_MAP = {
+  first_call: '\uD83C\uDFAF',
+  score_80: '\u2B50',
+  score_90: '\uD83C\uDF1F',
+  streak_3: '\uD83D\uDD25',
+  streak_7: '\uD83D\uDD25\uD83D\uDD25',
+  streak_30: '\uD83D\uDD25\uD83D\uDD25\uD83D\uDD25',
+  sessions_10: '\uD83D\uDCAA',
+  sessions_50: '\uD83C\uDFC6',
+  objection_master: '\uD83D\uDEE1\uFE0F',
+  closer: '\uD83E\uDD1D'
+};
+
+async function loadLeaderboard() {
+  const container = document.getElementById('leaderboardContainer');
+  container.innerHTML = '<div class="empty-state"><span class="spinner"></span> Loading leaderboard...</div>';
+  try {
+    const res = await fetch(API_BASE + '/leaderboard');
+    if (!res.ok) throw new Error('Failed to load leaderboard');
+    const data = await res.json();
+    const entries = Array.isArray(data) ? data : (data.leaderboard || data.rankings || []);
+    renderLeaderboard(entries);
+    updateStatsFromLeaderboard(entries);
+  } catch (e) {
+    container.innerHTML = '<div class="empty-state">No leaderboard data yet. Complete practice sessions to appear here.</div>';
+  }
+}
+
+function renderLeaderboard(entries) {
+  const container = document.getElementById('leaderboardContainer');
+  if (!entries.length) {
+    container.innerHTML = '<div class="empty-state">No leaderboard data yet. Complete practice sessions to appear here.</div>';
+    return;
+  }
+
+  let html = `<table class="leaderboard-table">
+    <thead><tr>
+      <th>Rank</th>
+      <th>Name</th>
+      <th>Avg Score</th>
+      <th>Best Score</th>
+      <th>Sessions</th>
+      <th>Practice Time</th>
+      <th>Streak</th>
+      <th>Badges</th>
+    </tr></thead><tbody>`;
+
+  entries.forEach((e, i) => {
+    const rank = e.rank || i + 1;
+    const name = e.name || e.rep_name || e.repName || 'Unknown';
+    const avg = e.avg_score || e.avgScore || e.average_score || 0;
+    const best = e.best_score || e.bestScore || e.top_score || 0;
+    const sess = e.sessions || e.session_count || e.total_sessions || 0;
+    const time = e.practice_time || e.practiceTime || e.total_time || 0;
+    const streak = e.streak || e.current_streak || 0;
+    const badges = e.badges || [];
+
+    const rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : '';
+    const avgClass = avg >= 80 ? 'high' : avg >= 60 ? 'mid' : 'low';
+    const bestClass = best >= 80 ? 'high' : best >= 60 ? 'mid' : 'low';
+
+    // Format time
+    const hrs = Math.floor(time / 3600);
+    const mins = Math.floor((time % 3600) / 60);
+    const timeStr = hrs > 0 ? hrs + 'h ' + mins + 'm' : mins + 'm';
+
+    // Map badges
+    const badgeIcons = badges.map(b => {
+      const key = typeof b === 'string' ? b : (b.type || b.name || b.id || '');
+      return BADGE_MAP[key] || '';
+    }).filter(Boolean).join(' ');
+
+    html += `<tr>
+      <td><span class="rank-cell ${rankClass}">${rank}</span></td>
+      <td><span class="rep-name">${escHtml(name)}</span></td>
+      <td><span class="score-highlight ${avgClass}">${avg}</span></td>
+      <td><span class="score-highlight ${bestClass}">${best}</span></td>
+      <td>${sess}</td>
+      <td><span class="time-value">${timeStr}</span></td>
+      <td><span class="streak-value">${streak > 0 ? streak + 'd' : '-'}</span></td>
+      <td><div class="badge-cell">${badgeIcons || '<span style="color:var(--text-muted);font-size:11px;">--</span>'}</div></td>
+    </tr>`;
+  });
+
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
+
+// ===== SCENARIO MODE =====
+let pendingScenario = null;
+let scenarioCountdown = null;
+
+function startScenario(scenarioId, btnEl) {
+  pendingScenario = scenarioId;
+  const savedPhone = localStorage.getItem('practicePhone') || '';
+  document.getElementById('phoneModalInput').value = savedPhone;
+
+  const names = {
+    objection_gauntlet: 'Objection Gauntlet',
+    appointment_closer: 'Appointment Closer',
+    kitchen_table: 'Kitchen Table',
+    recruiter_call: 'Recruiter Call',
+    full_random: 'Full Random'
+  };
+  document.getElementById('phoneModalDesc').textContent = 'We\'ll call you to start "' + (names[scenarioId] || scenarioId) + '".';
+  document.getElementById('phoneModal').classList.add('open');
+  document.getElementById('phoneModalInput').focus();
+}
+
+function closePhoneModal() {
+  document.getElementById('phoneModal').classList.remove('open');
+  pendingScenario = null;
+}
+
+// Close phone modal on overlay click
+document.getElementById('phoneModal').addEventListener('click', function(e) {
+  if (e.target === this) closePhoneModal();
+});
+
+async function submitScenarioCall() {
+  const phoneRaw = document.getElementById('phoneModalInput').value.trim();
+  if (!phoneRaw) {
+    showToast('Please enter a phone number', 'error');
+    return;
+  }
+
+  // Save for next time
+  localStorage.setItem('practicePhone', phoneRaw);
+
+  const btn = document.getElementById('phoneModalSubmit');
+  btn.disabled = true;
+  btn.textContent = 'Calling...';
+
+  try {
+    const res = await fetch(API_BASE + '/scenario', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        scenario: pendingScenario,
+        phone: phoneRaw
+      })
+    });
+    if (!res.ok) throw new Error('Failed to start scenario');
+
+    closePhoneModal();
+    showToast('Calling you now...', 'success');
+
+    // Show countdown on the card
+    const statusEl = document.getElementById('status-' + pendingScenario);
+    if (statusEl) {
+      let seconds = 30;
+      statusEl.classList.add('active');
+      statusEl.textContent = 'Calling you now... ' + seconds + 's';
+      if (scenarioCountdown) clearInterval(scenarioCountdown);
+      scenarioCountdown = setInterval(() => {
+        seconds--;
+        if (seconds <= 0) {
+          clearInterval(scenarioCountdown);
+          statusEl.textContent = 'Call initiated!';
+          setTimeout(() => { statusEl.classList.remove('active'); }, 3000);
+        } else {
+          statusEl.textContent = 'Calling you now... ' + seconds + 's';
+        }
+      }, 1000);
+    }
+  } catch (err) {
+    showToast('Failed to start scenario: ' + err.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Call Me';
+  }
+}
+
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded', () => {
   loadScripts();
   loadSessions();
+  loadLeaderboard();
 });
 </script>
 
