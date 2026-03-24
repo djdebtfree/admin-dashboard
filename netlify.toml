@@ -15,6 +15,11 @@
   to = "/setup.html"
   status = 200
 
+[[redirects]]
+  from = "/practice"
+  to = "/practice.html"
+  status = 200
+
 [[headers]]
   for = "/*"
   [headers.values]
