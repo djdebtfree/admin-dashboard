@@ -6,6 +6,11 @@
   node_bundler = "esbuild"
 
 [[redirects]]
+  from = "/demo"
+  to = "/demo.html"
+  status = 200
+
+[[redirects]]
   from = "/setup"
   to = "/setup.html"
   status = 200

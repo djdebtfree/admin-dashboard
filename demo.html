@@ -1,0 +1,1831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DataDriver Pro — AI-Powered Sales & Recruiting Automation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #000000;
+  --text: #FFFFFF;
+  --text-muted: #AAAAAA;
+  --text-dim: #666666;
+  --accent-blue: #007BFF;
+  --accent-yellow: #F5FF00;
+  --gradient: linear-gradient(135deg, #007BFF, #F5FF00);
+  --gradient-reverse: linear-gradient(135deg, #F5FF00, #007BFF);
+  --healthy: #00FF88;
+  --card-bg: #111111;
+  --card-border: #222222;
+  --card-hover: #1a1a1a;
+  --font: 'Montserrat', sans-serif;
+  --glow-blue: rgba(0,123,255,0.3);
+  --glow-yellow: rgba(245,255,0,0.2);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #444; }
+
+/* ===== HEADER ===== */
+.header {
+  padding: 16px 30px;
+  border-bottom: 1px solid var(--card-border);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0,0,0,0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  z-index: 1000;
+  transition: padding 0.3s;
+}
+.header.scrolled { padding: 10px 30px; }
+
+.header-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.header-title {
+  font-size: 18px;
+  font-weight: 800;
+  background: var(--gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.5px;
+  white-space: nowrap;
+}
+
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.header-nav a {
+  font-family: var(--font);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: all 0.2s;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.header-nav a:hover { color: var(--text); border-color: var(--card-border); background: var(--card-bg); }
+.header-nav a.active { color: var(--accent-blue); border-color: var(--accent-blue); background: rgba(0,123,255,0.08); }
+
+.btn {
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px 20px;
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  background: var(--card-bg);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn:hover { border-color: var(--accent-blue); background: #1a1a2a; }
+.btn-primary {
+  background: var(--accent-blue);
+  border-color: var(--accent-blue);
+  color: #fff;
+}
+.btn-primary:hover { background: #0069d9; transform: translateY(-1px); box-shadow: 0 4px 20px var(--glow-blue); }
+.btn-cta {
+  background: var(--gradient);
+  border: none;
+  color: #000;
+  font-weight: 700;
+  padding: 14px 32px;
+  font-size: 14px;
+  border-radius: 8px;
+  letter-spacing: 0.3px;
+}
+.btn-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 30px var(--glow-blue); }
+
+/* ===== HERO ===== */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 120px 30px 80px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 40%, rgba(0,123,255,0.08) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 40% at 70% 60%, rgba(245,255,0,0.04) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.hero-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black 30%, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black 30%, transparent 70%);
+  pointer-events: none;
+  animation: gridDrift 20s linear infinite;
+}
+@keyframes gridDrift {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(60px, 60px); }
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 900px;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  border: 1px solid var(--card-border);
+  border-radius: 20px;
+  background: var(--card-bg);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent-blue);
+  margin-bottom: 28px;
+  animation: fadeInUp 0.6s ease-out;
+}
+.hero-badge .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--healthy);
+  box-shadow: 0 0 8px var(--healthy);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.hero h1 {
+  font-size: clamp(36px, 5vw, 64px);
+  font-weight: 900;
+  line-height: 1.08;
+  letter-spacing: -2px;
+  margin-bottom: 24px;
+  animation: fadeInUp 0.6s ease-out 0.1s both;
+}
+.hero h1 .gradient-text {
+  background: var(--gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-tagline {
+  font-size: clamp(16px, 2vw, 22px);
+  font-weight: 400;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: 40px;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+  animation: fadeInUp 0.6s ease-out 0.2s both;
+}
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  animation: fadeInUp 0.6s ease-out 0.3s both;
+}
+
+.hero-stats {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 48px;
+  margin-top: 60px;
+  animation: fadeInUp 0.6s ease-out 0.4s both;
+}
+
+.hero-stat {
+  text-align: center;
+}
+.hero-stat .stat-value {
+  font-size: 32px;
+  font-weight: 800;
+  background: var(--gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-stat .stat-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 4px;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== SECTIONS ===== */
+.demo-section {
+  padding: 100px 30px;
+  position: relative;
+}
+.demo-section:nth-child(even) {
+  background: rgba(17,17,17,0.4);
+}
+
+.section-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.section-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--accent-blue);
+  margin-bottom: 12px;
+}
+
+.section-heading {
+  font-size: clamp(28px, 3.5vw, 44px);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -1px;
+  margin-bottom: 16px;
+}
+
+.section-desc {
+  font-size: 16px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  max-width: 600px;
+  margin-bottom: 48px;
+}
+
+/* ===== ARCHITECTURE DIAGRAM ===== */
+.arch-diagram {
+  position: relative;
+  padding: 40px 0;
+}
+
+.arch-flow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+.arch-node {
+  position: relative;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 20px 32px;
+  min-width: 320px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 2;
+}
+.arch-node:hover {
+  border-color: var(--accent-blue);
+  transform: scale(1.03);
+  box-shadow: 0 0 40px var(--glow-blue);
+}
+.arch-node.active {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 40px var(--glow-blue);
+}
+
+.arch-node-icon {
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+.arch-node-title {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.arch-node-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.arch-connector {
+  width: 2px;
+  height: 40px;
+  position: relative;
+  z-index: 1;
+}
+.arch-connector::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 2px;
+  height: 100%;
+  background: linear-gradient(180deg, var(--accent-blue), transparent);
+  animation: connectorPulse 2s ease-in-out infinite;
+}
+.arch-connector::after {
+  content: '';
+  position: absolute;
+  left: -3px;
+  bottom: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-blue);
+  box-shadow: 0 0 12px var(--accent-blue);
+  animation: nodePulse 2s ease-in-out infinite;
+}
+
+@keyframes connectorPulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+@keyframes nodePulse {
+  0%, 100% { transform: scale(0.8); opacity: 0.5; }
+  50% { transform: scale(1.2); opacity: 1; }
+}
+
+.arch-branch {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  width: 100%;
+  max-width: 1100px;
+  margin-top: 0;
+}
+
+.arch-branch .arch-node {
+  min-width: unset;
+}
+
+.arch-branch-connectors {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  width: 100%;
+  max-width: 1100px;
+  height: 40px;
+  position: relative;
+}
+.arch-branch-connectors::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 12.5%;
+  right: 12.5%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent-blue), var(--accent-blue), transparent);
+  animation: connectorPulse 2s ease-in-out infinite;
+}
+.arch-branch-connectors .branch-drop {
+  position: absolute;
+  top: 0;
+  width: 2px;
+  height: 100%;
+  background: linear-gradient(180deg, var(--accent-blue), transparent);
+  animation: connectorPulse 2s ease-in-out infinite;
+}
+.arch-branch-connectors .branch-drop:nth-child(1) { left: 12.5%; }
+.arch-branch-connectors .branch-drop:nth-child(2) { left: 37.5%; }
+.arch-branch-connectors .branch-drop:nth-child(3) { left: 62.5%; }
+.arch-branch-connectors .branch-drop:nth-child(4) { left: 87.5%; }
+
+.arch-detail {
+  margin-top: 24px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 24px 32px;
+  width: 100%;
+  max-width: 1100px;
+  display: none;
+  animation: fadeInUp 0.3s ease-out;
+}
+.arch-detail.visible { display: block; }
+.arch-detail-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--accent-blue);
+}
+.arch-detail-text {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+.arch-detail-text ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 8px;
+}
+.arch-detail-text ul li {
+  padding: 4px 0;
+  padding-left: 20px;
+  position: relative;
+}
+.arch-detail-text ul li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 11px;
+  width: 8px;
+  height: 2px;
+  background: var(--accent-blue);
+}
+
+/* ===== FEATURE CARDS ===== */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 20px;
+}
+
+.feature-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 28px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+.feature-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--card-border);
+  transition: background 0.3s;
+}
+.feature-card:hover {
+  border-color: #333;
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+}
+.feature-card:hover::before {
+  background: var(--gradient);
+}
+.feature-card.expanded {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 30px var(--glow-blue);
+}
+.feature-card.expanded::before {
+  background: var(--gradient);
+}
+
+.feature-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  margin-bottom: 16px;
+  background: rgba(0,123,255,0.08);
+  border: 1px solid rgba(0,123,255,0.15);
+}
+
+.feature-title {
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+
+.feature-summary {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.feature-expand-hint {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent-blue);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: gap 0.2s;
+}
+.feature-card:hover .feature-expand-hint { gap: 8px; }
+
+.feature-details {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.feature-card.expanded .feature-details {
+  max-height: 400px;
+}
+
+.feature-details-inner {
+  padding-top: 16px;
+  border-top: 1px solid var(--card-border);
+  margin-top: 16px;
+}
+
+.feature-detail-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 6px 0;
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.feature-detail-check {
+  color: var(--healthy);
+  font-size: 12px;
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+
+/* ===== PRICING ===== */
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.pricing-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: 36px 28px;
+  text-align: center;
+  position: relative;
+  transition: all 0.3s;
+}
+.pricing-card:hover {
+  transform: translateY(-4px);
+  border-color: #333;
+}
+.pricing-card.featured {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 40px var(--glow-blue);
+  transform: scale(1.04);
+}
+.pricing-card.featured:hover {
+  transform: scale(1.04) translateY(-4px);
+}
+
+.pricing-popular {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--gradient);
+  color: #000;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 4px 16px;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.pricing-name {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.pricing-price {
+  font-size: 42px;
+  font-weight: 900;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.pricing-price .currency { font-size: 22px; vertical-align: super; }
+.pricing-price .period { font-size: 14px; font-weight: 500; color: var(--text-muted); }
+
+.pricing-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 24px;
+  min-height: 36px;
+}
+
+.pricing-features {
+  text-align: left;
+  margin-bottom: 28px;
+}
+
+.pricing-feature {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 0;
+  font-size: 13px;
+  color: var(--text-muted);
+  border-bottom: 1px solid rgba(34,34,34,0.5);
+}
+.pricing-feature:last-child { border-bottom: none; }
+
+.pricing-check {
+  color: var(--healthy);
+  font-size: 13px;
+  flex-shrink: 0;
+}
+.pricing-check.no {
+  color: var(--text-dim);
+}
+
+.pricing-btn {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  text-align: center;
+  transition: all 0.2s;
+  cursor: pointer;
+  border: none;
+}
+.pricing-btn-outline {
+  border: 1px solid var(--card-border);
+  background: transparent;
+  color: var(--text);
+}
+.pricing-btn-outline:hover { border-color: var(--accent-blue); background: rgba(0,123,255,0.08); }
+.pricing-btn-primary {
+  background: var(--gradient);
+  color: #000;
+}
+.pricing-btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 20px var(--glow-blue); }
+
+/* ===== SLIDESHOW ===== */
+.slideshow-wrap {
+  position: relative;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  overflow: hidden;
+  aspect-ratio: 16/9;
+  max-height: 80vh;
+}
+.slideshow-wrap.fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  border-radius: 0;
+  border: none;
+  max-height: none;
+  aspect-ratio: unset;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 60px 80px;
+  opacity: 0;
+  transform: scale(0.96);
+  transition: opacity 0.5s, transform 0.5s;
+  pointer-events: none;
+}
+.slide.active {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
+}
+
+.slide-number {
+  position: absolute;
+  top: 24px;
+  left: 32px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+}
+
+.slide-icon {
+  font-size: 48px;
+  margin-bottom: 24px;
+}
+
+.slide h2 {
+  font-size: clamp(24px, 3vw, 42px);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -1px;
+  margin-bottom: 16px;
+}
+.slide h2 .gradient-text {
+  background: var(--gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.slide p {
+  font-size: clamp(14px, 1.5vw, 18px);
+  color: var(--text-muted);
+  line-height: 1.6;
+  max-width: 700px;
+}
+
+.slide-bullets {
+  text-align: left;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.slide-bullet {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: clamp(13px, 1.3vw, 16px);
+  color: var(--text-muted);
+}
+.slide-bullet .bullet-icon {
+  color: var(--accent-blue);
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.slide-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 24px;
+  text-align: left;
+  width: 100%;
+  max-width: 700px;
+}
+
+.slide-mini-card {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  padding: 16px;
+}
+.slide-mini-card-title {
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.slide-mini-card-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.slide-presenter-note {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(0,0,0,0.95));
+  padding: 40px 32px 24px;
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.5;
+  opacity: 0;
+  transition: opacity 0.3s;
+  text-align: left;
+  font-style: italic;
+}
+.slideshow-wrap:hover .slide.active .slide-presenter-note,
+.slideshow-wrap.fullscreen .slide.active .slide-presenter-note {
+  opacity: 1;
+}
+
+/* Slideshow controls */
+.slide-controls {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 10;
+}
+
+.slide-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--card-border);
+  background: rgba(0,0,0,0.6);
+  color: var(--text);
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  backdrop-filter: blur(10px);
+}
+.slide-btn:hover { border-color: var(--accent-blue); background: rgba(0,123,255,0.15); }
+
+.slide-dots {
+  display: flex;
+  gap: 6px;
+}
+.slide-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.slide-dot.active { background: var(--accent-blue); transform: scale(1.3); box-shadow: 0 0 8px var(--accent-blue); }
+
+.slide-fullscreen-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 10;
+}
+
+/* ===== PRESENTER SCRIPT ===== */
+.script-section {
+  margin-top: 40px;
+}
+
+.script-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 24px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+  text-align: left;
+  font-family: var(--font);
+  color: var(--text);
+}
+.script-toggle:hover { border-color: #333; }
+.script-toggle-title {
+  font-size: 14px;
+  font-weight: 700;
+  flex: 1;
+}
+.script-toggle-arrow {
+  font-size: 14px;
+  color: var(--accent-blue);
+  transition: transform 0.3s;
+}
+.script-toggle.open .script-toggle-arrow { transform: rotate(180deg); }
+
+.script-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.script-body.open {
+  max-height: 4000px;
+}
+
+.script-content {
+  padding: 24px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-top: none;
+  border-radius: 0 0 12px 12px;
+}
+
+.script-slide {
+  margin-bottom: 24px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--card-border);
+}
+.script-slide:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+.script-slide-num {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--accent-blue);
+  margin-bottom: 4px;
+}
+.script-slide-title {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.script-slide-text {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.8;
+  font-style: italic;
+}
+
+/* ===== FOOTER ===== */
+.demo-footer {
+  padding: 60px 30px;
+  text-align: center;
+  border-top: 1px solid var(--card-border);
+}
+.demo-footer-brand {
+  font-size: 20px;
+  font-weight: 800;
+  background: var(--gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+}
+.demo-footer-sub {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+/* ===== ANIMATE ON SCROLL ===== */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+  .arch-branch { grid-template-columns: repeat(2, 1fr); }
+  .pricing-grid { grid-template-columns: 1fr; max-width: 400px; }
+  .pricing-card.featured { transform: none; }
+  .pricing-card.featured:hover { transform: translateY(-4px); }
+  .features-grid { grid-template-columns: 1fr; }
+  .slide { padding: 40px 30px; }
+  .hero-stats { gap: 24px; flex-wrap: wrap; }
+}
+
+@media (max-width: 600px) {
+  .header-nav { display: none; }
+  .arch-branch { grid-template-columns: 1fr; }
+  .arch-node { min-width: unset; width: 100%; }
+  .slide-grid-2 { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="header" id="header">
+  <div class="header-inner">
+    <div class="header-title">DATADRIVER PRO</div>
+    <nav class="header-nav">
+      <a href="#hero">Overview</a>
+      <a href="#architecture">Architecture</a>
+      <a href="#features">Features</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#presentation">Slides</a>
+      <a href="/" class="btn" style="font-size:11px;padding:5px 12px;">Admin Dashboard</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ===== HERO ===== -->
+<section class="hero" id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-badge">
+      <span class="dot"></span>
+      Available on GHL Marketplace
+    </div>
+    <h1>
+      <span class="gradient-text">AI-Powered</span> Sales &amp;<br>
+      Recruiting Automation<br>
+      for GoHighLevel
+    </h1>
+    <p class="hero-tagline">
+      Install once. Automate everything. Close more deals.<br>
+      DataDriver Pro gives your GHL account a fleet of AI agents, intelligent data enrichment,
+      and a voice-enabled sales assistant &mdash; all from a single free install.
+    </p>
+    <div class="hero-actions">
+      <a href="#architecture" class="btn-cta" style="text-decoration:none;">See How It Works</a>
+      <a href="#pricing" class="btn" style="text-decoration:none;">View Pricing</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="stat-value" id="statAgents">36</div>
+        <div class="stat-label">AI Agents</div>
+      </div>
+      <div class="hero-stat">
+        <div class="stat-value">4.7M+</div>
+        <div class="stat-label">Records Ready</div>
+      </div>
+      <div class="hero-stat">
+        <div class="stat-value">14</div>
+        <div class="stat-label">Day Free Trial</div>
+      </div>
+      <div class="hero-stat">
+        <div class="stat-value">25</div>
+        <div class="stat-label">Integrated Services</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== ARCHITECTURE ===== -->
+<section class="demo-section" id="architecture">
+  <div class="section-inner">
+    <div class="section-label reveal">System Architecture</div>
+    <h2 class="section-heading reveal">How DataDriver Pro Works</h2>
+    <p class="section-desc reveal">
+      One free install from the GHL Marketplace activates an entire AI-powered sales and recruiting engine inside every sub-account.
+    </p>
+
+    <div class="arch-diagram reveal">
+      <div class="arch-flow">
+        <!-- Top node -->
+        <div class="arch-node" data-detail="marketplace" onclick="showArchDetail('marketplace')">
+          <div class="arch-node-icon">&#127979;</div>
+          <div class="arch-node-title">GHL Marketplace</div>
+          <div class="arch-node-sub">Free Install &mdash; One Click</div>
+        </div>
+
+        <div class="arch-connector"></div>
+
+        <!-- Trial node -->
+        <div class="arch-node" data-detail="trial" onclick="showArchDetail('trial')">
+          <div class="arch-node-icon">&#128273;</div>
+          <div class="arch-node-title">14-Day Full Access Trial</div>
+          <div class="arch-node-sub">Every feature, every agent, no credit card</div>
+        </div>
+
+        <div class="arch-connector"></div>
+
+        <!-- Dashboard node -->
+        <div class="arch-node" data-detail="dashboard" onclick="showArchDetail('dashboard')">
+          <div class="arch-node-icon">&#128202;</div>
+          <div class="arch-node-title">DataDriver Dashboard</div>
+          <div class="arch-node-sub">Lives inside GHL sidebar &mdash; no separate login</div>
+        </div>
+
+        <div class="arch-connector"></div>
+
+        <!-- Branch connectors -->
+        <div class="arch-branch-connectors">
+          <div class="branch-drop"></div>
+          <div class="branch-drop"></div>
+          <div class="branch-drop"></div>
+          <div class="branch-drop"></div>
+        </div>
+
+        <!-- Branch nodes -->
+        <div class="arch-branch">
+          <div class="arch-node" data-detail="engine" onclick="showArchDetail('engine')">
+            <div class="arch-node-icon">&#129504;</div>
+            <div class="arch-node-title">Intelligence Engine</div>
+            <div class="arch-node-sub">Enrichment + Validation</div>
+          </div>
+          <div class="arch-node" data-detail="agents" onclick="showArchDetail('agents')">
+            <div class="arch-node-icon">&#129302;</div>
+            <div class="arch-node-title">Sandy AI Fleet</div>
+            <div class="arch-node-sub">36 Autonomous Agents</div>
+          </div>
+          <div class="arch-node" data-detail="audiences" onclick="showArchDetail('audiences')">
+            <div class="arch-node-icon">&#127919;</div>
+            <div class="arch-node-title">Smart Audiences</div>
+            <div class="arch-node-sub">Segment Builder + Push</div>
+          </div>
+          <div class="arch-node" data-detail="voice" onclick="showArchDetail('voice')">
+            <div class="arch-node-icon">&#128252;</div>
+            <div class="arch-node-title">Sandy Voice &amp; Video</div>
+            <div class="arch-node-sub">AI Calls + Avatar Meetings</div>
+          </div>
+        </div>
+
+        <!-- Detail panel -->
+        <div class="arch-detail" id="archDetail">
+          <div class="arch-detail-title" id="archDetailTitle"></div>
+          <div class="arch-detail-text" id="archDetailText"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FEATURES ===== -->
+<section class="demo-section" id="features">
+  <div class="section-inner">
+    <div class="section-label reveal">Capabilities</div>
+    <h2 class="section-heading reveal">Everything You Need to<br><span style="background:var(--gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Automate Your Pipeline</span></h2>
+    <p class="section-desc reveal">
+      Six integrated modules that transform GHL into an autonomous sales and recruiting machine.
+    </p>
+
+    <div class="features-grid">
+      <!-- Card 1 -->
+      <div class="feature-card reveal" onclick="toggleFeature(this)">
+        <div class="feature-icon">&#128268;</div>
+        <div class="feature-title">Instant GHL Integration</div>
+        <div class="feature-summary">One free install from the GHL Marketplace. Works across all sub-accounts instantly &mdash; no separate login required.</div>
+        <div class="feature-expand-hint">See details &#8594;</div>
+        <div class="feature-details">
+          <div class="feature-details-inner">
+            <div class="feature-detail-item"><span class="feature-detail-check">&#10003;</span> Free install from GHL Marketplace &mdash; zero setup friction</div>
+            <div class="feature-detail-item"><span class="feature-detail-check">&#10003;</span> Auto-installs in ALL sub-accounts (current + future)</div>
+            <div class="feature-detail-item"><span class="feature-detail-check">&#10003;</span> Runs inside the GHL sidebar &mdash; your team never leaves their CRM</div>
+            <div class="feature-detail-item"><span class="feature-detail-check">&#10003;</span> 14-day trial of every feature, every agent, no credit card needed</div>
+            <div class="feature-detail-item"><span class="feature-detail-check">&#10003;</span> SSO integration &mdash; if you're logged into GHL, you're logged in</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="feature-card reveal" onclick="toggleFeature(this)">
+        <div class="feature-icon">&#129504;</div>
+        <div class="feature-title">DataDriver Intelligence Engine</div>
+        <div class="feature-summary">Proprietary contact enrichment from multiple data sources with real-time validation and confidence scoring.</div>
+        <div class="feature-expand-hint">See details &#8594;</div>
+        <div class="feature-details">
+          <div class="feature-details-inner">
+            <div class="feature-detail-item"><span class="feature-detail-check">&#10003;</span> Contact enrichment from multiple proprietary data sources</div>
+            <div class="feature-detail-item"><span class="feature-detail-check">&#10003;</span> LinkedIn validation + confidence scoring (0&ndash;100)</div>
+            <div class="feature-detail-item"><span class="feature-detail-check">&#10003;</span> Email verification + company matching</div>
+            <div class="feature-detail-item"><span class="feature-detail-check">&#10003;</span> 4.7M+ records ready to process on demand</div>
+            <div class="feature-detail-item"><span class="feature-detail-check">&#10003;</span> Real-time pipeline status with enrichment analytics</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="feature-card reveal" onclick="toggleFeature(this)">
+        <div class="feature-icon">&#129302;</div>
+        <div class="feature-title">Sandy AI Agent Fleet</div>
+        <div class="feature-summary">36 autonomous AI agents handle every stage of your pipeline &mdash; from first contact to closed deal.</div>
+        <div class="feature-expand-hint">See details &#8594;</div>
+        <div class="feature-details">
+          <div class="feature-details-inner">
+            <div class="feature-detail-item"><span class="feature-detail-check">&#10003;</span> 36 specialized AI agents for sales + recruiting</div>
+            <div class="feature-detail-item"><span class="feature-detail-check">&#10003;</span> Lite tier: 19 agents cover gate &rarr; scan &rarr; brief &rarr; outreach &rarr; schedule &rarr; close &rarr; log</div>
+            <div class="feature-detail-item"><span class="feature-detail-check">&#10003;</span> Pro tier: +13 agents for post-meeting, onboarding, mentorship, video escalation</div>
+            <div class="feature-detail-item"><span class="feature-detail-check">&#10003;</span> Every agent follows ethical AI principles &mdash; transparent, consent-based, no pressure</div>
+            <div class="feature-detail-item"><span class="feature-detail-check">&#10003;</span> Full audit trail &mdash; see every action every agent takes</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="feature-card reveal" onclick="toggleFeature(this)">
+        <div class="feature-icon">&#127919;</div>
+        <div class="feature-title">Smart Audiences</div>
+        <div class="feature-summary">Define your ideal audience, and DataDriver builds, cleans, validates, and pushes the list to GHL automatically.</div>
+        <div class="feature-expand-hint">See details &#8594;</div>
+        <div class="feature-details">
+          <div class="feature-details-inner">
+            <div class="feature-detail-item"><span class="feature-detail-check">&#10003;</span> Define your ideal audience &mdash; industry, location, title, company size</div>
+            <div class="feature-detail-item"><span class="feature-detail-check">&#10003;</span> AI builds, cleans, validates, and scores your list automatically</div>
+            <div class="feature-detail-item"><span class="feature-detail-check">&#10003;</span> One-click push to GHL with auto-tagging and pipeline assignment</div>
+            <div class="feature-detail-item"><span class="feature-detail-check">&#10003;</span> Pay only for what you use &mdash; $0.25 per enriched contact</div>
+            <div class="feature-detail-item"><span class="feature-detail-check">&#10003;</span> Duplicate detection and suppression across campaigns</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 5 -->
+      <div class="feature-card reveal" onclick="toggleFeature(this)">
+        <div class="feature-icon">&#128252;</div>
+        <div class="feature-title">Sandy &mdash; Voice &amp; Video AI</div>
+        <div class="feature-summary">AI phone calls, video avatar meetings, visitor recognition, and automatic follow-ups &mdash; all handled by Sandy.</div>
+        <div class="feature-expand-hint">See details &#8594;</div>
+        <div class="feature-details">
+          <div class="feature-details-inner">
+            <div class="feature-detail-item"><span class="feature-detail-check">&#10003;</span> AI phone calls (inbound + outbound) with natural, human-quality voice</div>
+            <div class="feature-detail-item"><span class="feature-detail-check">&#10003;</span> Video avatar meetings embedded on your website</div>
+            <div class="feature-detail-item"><span class="feature-detail-check">&#10003;</span> Visitor recognition &mdash; personalized greetings for returning contacts</div>
+            <div class="feature-detail-item"><span class="feature-detail-check">&#10003;</span> Automatic escalation to a human team member when needed</div>
+            <div class="feature-detail-item"><span class="feature-detail-check">&#10003;</span> SMS/email follow-ups sent automatically after every interaction</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 6 -->
+      <div class="feature-card reveal" onclick="toggleFeature(this)">
+        <div class="feature-icon">&#128200;</div>
+        <div class="feature-title">Complete Dashboard &amp; Analytics</div>
+        <div class="feature-summary">Real-time monitoring of every agent, every enrichment pipeline, and every dollar &mdash; all in one view.</div>
+        <div class="feature-expand-hint">See details &#8594;</div>
+        <div class="feature-details">
+          <div class="feature-details-inner">
+            <div class="feature-detail-item"><span class="feature-detail-check">&#10003;</span> Real-time agent activity monitoring with live status feeds</div>
+            <div class="feature-detail-item"><span class="feature-detail-check">&#10003;</span> Contact enrichment pipeline status and throughput metrics</div>
+            <div class="feature-detail-item"><span class="feature-detail-check">&#10003;</span> Revenue tracking + billing overview per sub-account</div>
+            <div class="feature-detail-item"><span class="feature-detail-check">&#10003;</span> 25-service health monitoring with instant alerts</div>
+            <div class="feature-detail-item"><span class="feature-detail-check">&#10003;</span> Trial management, tier upgrades, and usage analytics</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PRICING ===== -->
+<section class="demo-section" id="pricing">
+  <div class="section-inner">
+    <div class="section-label reveal" style="text-align:center;">Pricing</div>
+    <h2 class="section-heading reveal" style="text-align:center;">Simple, Transparent Pricing</h2>
+    <p class="section-desc reveal" style="text-align:center;max-width:500px;margin-left:auto;margin-right:auto;">
+      Start free. Upgrade when you're ready. No hidden fees, no surprise charges.
+    </p>
+
+    <div class="pricing-grid reveal">
+      <!-- Free -->
+      <div class="pricing-card">
+        <div class="pricing-name">Free</div>
+        <div class="pricing-price"><span class="currency">$</span>0</div>
+        <div class="pricing-desc">14-day trial of everything.<br>No credit card required.</div>
+        <div class="pricing-features">
+          <div class="pricing-feature"><span class="pricing-check">&#10003;</span> GHL Marketplace install</div>
+          <div class="pricing-feature"><span class="pricing-check">&#10003;</span> All 36 AI agents (14 days)</div>
+          <div class="pricing-feature"><span class="pricing-check">&#10003;</span> Intelligence Engine access</div>
+          <div class="pricing-feature"><span class="pricing-check">&#10003;</span> Smart Audiences</div>
+          <div class="pricing-feature"><span class="pricing-check">&#10003;</span> Sandy Voice &amp; Video</div>
+          <div class="pricing-feature"><span class="pricing-check">&#10003;</span> Dashboard &amp; Analytics</div>
+          <div class="pricing-feature"><span class="pricing-check no">&mdash;</span> <span style="color:var(--text-dim)">Post-trial: reverts to Lite</span></div>
+        </div>
+        <button class="pricing-btn pricing-btn-outline">Start Free Trial</button>
+      </div>
+
+      <!-- Pro -->
+      <div class="pricing-card featured">
+        <div class="pricing-popular">Most Popular</div>
+        <div class="pricing-name">Pro</div>
+        <div class="pricing-price"><span class="currency">$</span>497 <span class="period">lifetime</span></div>
+        <div class="pricing-desc">One-time payment. Full access forever.<br>Best for agencies scaling up.</div>
+        <div class="pricing-features">
+          <div class="pricing-feature"><span class="pricing-check">&#10003;</span> Everything in Free</div>
+          <div class="pricing-feature"><span class="pricing-check">&#10003;</span> 19 Lite-tier agents (permanent)</div>
+          <div class="pricing-feature"><span class="pricing-check">&#10003;</span> Full Intelligence Engine</div>
+          <div class="pricing-feature"><span class="pricing-check">&#10003;</span> Smart Audiences + push to GHL</div>
+          <div class="pricing-feature"><span class="pricing-check">&#10003;</span> Sandy Voice (inbound + outbound)</div>
+          <div class="pricing-feature"><span class="pricing-check">&#10003;</span> Full dashboard &amp; analytics</div>
+          <div class="pricing-feature"><span class="pricing-check">&#10003;</span> $0.25/contact enrichment</div>
+        </div>
+        <button class="pricing-btn pricing-btn-primary">Get Pro Access</button>
+      </div>
+
+      <!-- Pro+ -->
+      <div class="pricing-card">
+        <div class="pricing-name">Pro+</div>
+        <div class="pricing-price"><span class="currency">$</span>997 <span class="period">+ $199/mo</span></div>
+        <div class="pricing-desc">Everything in Pro, plus advanced agents, video avatar, and priority support.</div>
+        <div class="pricing-features">
+          <div class="pricing-feature"><span class="pricing-check">&#10003;</span> Everything in Pro</div>
+          <div class="pricing-feature"><span class="pricing-check">&#10003;</span> All 36 agents (Pro + Advanced)</div>
+          <div class="pricing-feature"><span class="pricing-check">&#10003;</span> Sandy Video Avatar meetings</div>
+          <div class="pricing-feature"><span class="pricing-check">&#10003;</span> Post-meeting &amp; onboarding agents</div>
+          <div class="pricing-feature"><span class="pricing-check">&#10003;</span> Mentorship &amp; coaching agents</div>
+          <div class="pricing-feature"><span class="pricing-check">&#10003;</span> Video escalation pipeline</div>
+          <div class="pricing-feature"><span class="pricing-check">&#10003;</span> Priority support + SLA</div>
+        </div>
+        <button class="pricing-btn pricing-btn-outline">Upgrade to Pro+</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SLIDE PRESENTATION ===== -->
+<section class="demo-section" id="presentation">
+  <div class="section-inner">
+    <div class="section-label reveal" style="text-align:center;">Presentation</div>
+    <h2 class="section-heading reveal" style="text-align:center;">The DataDriver Pro Story</h2>
+    <p class="section-desc reveal" style="text-align:center;max-width:500px;margin-left:auto;margin-right:auto;">
+      A 10-slide walkthrough of the entire system. Click fullscreen for presentation mode. Hover for presenter notes.
+    </p>
+
+    <div class="slideshow-wrap reveal" id="slideshow">
+      <!-- Fullscreen button -->
+      <button class="slide-btn slide-fullscreen-btn" onclick="toggleFullscreen()" title="Toggle fullscreen">&#9974;</button>
+
+      <!-- SLIDE 1: Title -->
+      <div class="slide active" data-slide="0">
+        <div class="slide-number">01 / 10</div>
+        <div class="slide-icon">&#9889;</div>
+        <h2><span class="gradient-text">DataDriver Pro</span></h2>
+        <p>The Future of AI Sales &amp; Recruiting Automation for GoHighLevel</p>
+        <div class="slide-presenter-note">
+          <strong>Script:</strong> "Welcome to DataDriver Pro. What you're about to see is the most comprehensive AI-powered sales and recruiting system ever built for GoHighLevel. One free install. Full automation. Let me show you how it works."
+        </div>
+      </div>
+
+      <!-- SLIDE 2: The Problem -->
+      <div class="slide" data-slide="1">
+        <div class="slide-number">02 / 10</div>
+        <div class="slide-icon">&#128548;</div>
+        <h2>The Problem</h2>
+        <div class="slide-bullets">
+          <div class="slide-bullet"><span class="bullet-icon">&#10005;</span> Manual prospecting wastes 60% of your sales team's time</div>
+          <div class="slide-bullet"><span class="bullet-icon">&#10005;</span> Contact data decays at 30% per year &mdash; your lists are rotting</div>
+          <div class="slide-bullet"><span class="bullet-icon">&#10005;</span> Missed follow-ups cost you 80% of potential deals</div>
+          <div class="slide-bullet"><span class="bullet-icon">&#10005;</span> Disconnected tools create data silos and manual busywork</div>
+          <div class="slide-bullet"><span class="bullet-icon">&#10005;</span> Scaling means hiring more people, not working smarter</div>
+        </div>
+        <div class="slide-presenter-note">
+          <strong>Script:</strong> "Let's be honest about what's broken. Your sales team spends more than half their day on manual prospecting. Your contact lists are decaying at thirty percent a year. Follow-ups slip through the cracks. And every tool you add creates another silo. DataDriver Pro fixes all of this."
+        </div>
+      </div>
+
+      <!-- SLIDE 3: The Solution -->
+      <div class="slide" data-slide="2">
+        <div class="slide-number">03 / 10</div>
+        <div class="slide-icon">&#128161;</div>
+        <h2>One Free Install.<br><span class="gradient-text">Full Automation.</span></h2>
+        <p>DataDriver Pro installs from the GHL Marketplace in one click. It activates in every sub-account &mdash; current and future. Your team gets an AI-powered sales engine without leaving their CRM.</p>
+        <div class="slide-presenter-note">
+          <strong>Script:</strong> "The solution is elegant. One free install from the GHL Marketplace, and you unlock the full DataDriver Pro engine across every sub-account you manage &mdash; even ones you create in the future. No separate login, no migration headaches. It just works inside GHL."
+        </div>
+      </div>
+
+      <!-- SLIDE 4: Architecture -->
+      <div class="slide" data-slide="3">
+        <div class="slide-number">04 / 10</div>
+        <div class="slide-icon">&#128736;</div>
+        <h2>How It Works</h2>
+        <div class="slide-grid-2">
+          <div class="slide-mini-card">
+            <div class="slide-mini-card-title">&#129504; Intelligence Engine</div>
+            <div class="slide-mini-card-desc">Enriches and validates every contact from multiple proprietary data sources.</div>
+          </div>
+          <div class="slide-mini-card">
+            <div class="slide-mini-card-title">&#129302; Sandy AI Fleet</div>
+            <div class="slide-mini-card-desc">36 agents handle the full pipeline autonomously from first touch to close.</div>
+          </div>
+          <div class="slide-mini-card">
+            <div class="slide-mini-card-title">&#127919; Smart Audiences</div>
+            <div class="slide-mini-card-desc">Build, clean, validate, and push targeted lists to GHL in one click.</div>
+          </div>
+          <div class="slide-mini-card">
+            <div class="slide-mini-card-title">&#128252; Voice &amp; Video</div>
+            <div class="slide-mini-card-desc">Sandy makes calls, joins meetings, and follows up automatically.</div>
+          </div>
+        </div>
+        <div class="slide-presenter-note">
+          <strong>Script:</strong> "Under the hood, there are four core modules. The Intelligence Engine handles all data enrichment and validation. The Sandy AI Fleet provides thirty-six specialized agents. Smart Audiences builds and pushes targeted lists. And Sandy Voice and Video handles calls and meetings with a natural AI voice."
+        </div>
+      </div>
+
+      <!-- SLIDE 5: Intelligence Engine -->
+      <div class="slide" data-slide="4">
+        <div class="slide-number">05 / 10</div>
+        <div class="slide-icon">&#129504;</div>
+        <h2>DataDriver <span class="gradient-text">Intelligence Engine</span></h2>
+        <div class="slide-bullets">
+          <div class="slide-bullet"><span class="bullet-icon">&#9679;</span> Multi-source contact enrichment in real-time</div>
+          <div class="slide-bullet"><span class="bullet-icon">&#9679;</span> LinkedIn validation with 0&ndash;100 confidence scoring</div>
+          <div class="slide-bullet"><span class="bullet-icon">&#9679;</span> Email verification + company matching</div>
+          <div class="slide-bullet"><span class="bullet-icon">&#9679;</span> 4.7 million records ready to process on demand</div>
+        </div>
+        <div class="slide-presenter-note">
+          <strong>Script:</strong> "The Intelligence Engine is your data backbone. It pulls from multiple proprietary data sources, validates LinkedIn profiles, verifies emails, and assigns a confidence score to every contact. We have over four-point-seven million records ready to process &mdash; and that number grows every day."
+        </div>
+      </div>
+
+      <!-- SLIDE 6: Sandy AI Fleet -->
+      <div class="slide" data-slide="5">
+        <div class="slide-number">06 / 10</div>
+        <div class="slide-icon">&#129302;</div>
+        <h2>Sandy AI <span class="gradient-text">Agent Fleet</span></h2>
+        <div class="slide-bullets">
+          <div class="slide-bullet"><span class="bullet-icon">&#9679;</span> 36 autonomous agents &mdash; sales and recruiting</div>
+          <div class="slide-bullet"><span class="bullet-icon">&#9679;</span> Lite: 19 agents (gate &rarr; scan &rarr; brief &rarr; outreach &rarr; schedule &rarr; close &rarr; log)</div>
+          <div class="slide-bullet"><span class="bullet-icon">&#9679;</span> Pro: +13 agents (post-meeting, onboarding, mentorship, video)</div>
+          <div class="slide-bullet"><span class="bullet-icon">&#9679;</span> Ethical AI &mdash; transparent, consent-based, no pressure tactics</div>
+        </div>
+        <div class="slide-presenter-note">
+          <strong>Script:</strong> "Sandy's AI Fleet is where the magic happens. Thirty-six specialized agents, each with a specific role. In the Lite tier, nineteen agents handle the core pipeline from first contact all the way through to logging the closed deal. Upgrade to Pro and you get thirteen more agents for post-meeting follow-ups, onboarding, mentorship, and video escalation. Every agent follows ethical AI principles &mdash; always transparent, always consent-based."
+        </div>
+      </div>
+
+      <!-- SLIDE 7: Smart Audiences -->
+      <div class="slide" data-slide="6">
+        <div class="slide-number">07 / 10</div>
+        <div class="slide-icon">&#127919;</div>
+        <h2><span class="gradient-text">Smart Audiences</span></h2>
+        <div class="slide-bullets">
+          <div class="slide-bullet"><span class="bullet-icon">&#9679;</span> Define your ideal audience: industry, location, title, company size</div>
+          <div class="slide-bullet"><span class="bullet-icon">&#9679;</span> AI builds, cleans, validates, and scores the list</div>
+          <div class="slide-bullet"><span class="bullet-icon">&#9679;</span> One-click push to GHL with auto-tagging</div>
+          <div class="slide-bullet"><span class="bullet-icon">&#9679;</span> Pay per contact: $0.25 each &mdash; no minimums</div>
+        </div>
+        <div class="slide-presenter-note">
+          <strong>Script:</strong> "Smart Audiences is the Segment Builder. You tell us who you want to reach &mdash; pick an industry, set a location, choose titles and company sizes. Our AI builds the list, cleans it, validates every contact, and scores them. Then you push the whole thing into GHL with one click. Auto-tagged, pipeline-assigned, ready for your agents to work. And you only pay twenty-five cents per enriched contact."
+        </div>
+      </div>
+
+      <!-- SLIDE 8: Voice & Video -->
+      <div class="slide" data-slide="7">
+        <div class="slide-number">08 / 10</div>
+        <div class="slide-icon">&#128252;</div>
+        <h2>Sandy &mdash; <span class="gradient-text">Voice &amp; Video AI</span></h2>
+        <div class="slide-bullets">
+          <div class="slide-bullet"><span class="bullet-icon">&#9679;</span> AI phone calls: natural voice, inbound and outbound</div>
+          <div class="slide-bullet"><span class="bullet-icon">&#9679;</span> Video avatar meetings on your website</div>
+          <div class="slide-bullet"><span class="bullet-icon">&#9679;</span> Visitor recognition &mdash; personalized greetings for known contacts</div>
+          <div class="slide-bullet"><span class="bullet-icon">&#9679;</span> Auto-escalation to human + SMS/email follow-ups</div>
+        </div>
+        <div class="slide-presenter-note">
+          <strong>Script:</strong> "And then there's Sandy herself. She makes and takes phone calls with a completely natural voice. She can join video meetings as an avatar on your website. She recognizes returning visitors and greets them by name. When she needs a human, she escalates seamlessly. And after every interaction, she sends follow-up texts and emails automatically."
+        </div>
+      </div>
+
+      <!-- SLIDE 9: Pricing -->
+      <div class="slide" data-slide="8">
+        <div class="slide-number">09 / 10</div>
+        <div class="slide-icon">&#128176;</div>
+        <h2>Simple <span class="gradient-text">Pricing</span></h2>
+        <div class="slide-grid-2">
+          <div class="slide-mini-card" style="grid-column: span 2;">
+            <div class="slide-mini-card-title" style="font-size:15px;">Three tiers. No surprises.</div>
+            <div class="slide-mini-card-desc" style="font-size:13px;margin-top:8px;">
+              <strong style="color:var(--text);">Free:</strong> 14-day trial of everything, no credit card<br>
+              <strong style="color:var(--accent-blue);">Pro ($497 lifetime):</strong> 19 agents, full engine, Smart Audiences, voice<br>
+              <strong style="color:var(--accent-yellow);">Pro+ ($997 + $199/mo):</strong> All 36 agents, video avatar, advanced pipeline, priority support
+            </div>
+          </div>
+        </div>
+        <div class="slide-presenter-note">
+          <strong>Script:</strong> "Pricing is dead simple. Free tier gives you fourteen days with everything &mdash; no credit card needed. Pro is a one-time four-ninety-seven for lifetime access to nineteen agents, the full Intelligence Engine, Smart Audiences, and Sandy Voice. Pro Plus adds all thirty-six agents, video avatar meetings, and priority support for nine-ninety-seven plus one-ninety-nine a month."
+        </div>
+      </div>
+
+      <!-- SLIDE 10: CTA -->
+      <div class="slide" data-slide="9">
+        <div class="slide-number">10 / 10</div>
+        <div class="slide-icon">&#128640;</div>
+        <h2>Ready to <span class="gradient-text">Automate?</span></h2>
+        <p style="margin-bottom:32px;">Install DataDriver Pro free from the GHL Marketplace.<br>Your AI-powered pipeline starts in 60 seconds.</p>
+        <a href="#" class="btn-cta" style="text-decoration:none;display:inline-flex;">Install Free from GHL Marketplace</a>
+        <div class="slide-presenter-note">
+          <strong>Script:</strong> "So here's the ask. Go to the GHL Marketplace, search DataDriver Pro, and hit install. That's it. Sixty seconds and your account has a full AI sales engine. Fourteen days to try everything. No credit card. No risk. And if you love it &mdash; which you will &mdash; upgrade to Pro for lifetime access. Thank you."
+        </div>
+      </div>
+
+      <!-- Slide Controls -->
+      <div class="slide-controls">
+        <button class="slide-btn" onclick="changeSlide(-1)">&#8592;</button>
+        <div class="slide-dots" id="slideDots"></div>
+        <button class="slide-btn" onclick="changeSlide(1)">&#8594;</button>
+      </div>
+    </div>
+
+    <!-- PRESENTER SCRIPT -->
+    <div class="script-section reveal">
+      <button class="script-toggle" id="scriptToggle" onclick="toggleScript()">
+        <span style="font-size:18px;">&#128220;</span>
+        <span class="script-toggle-title">Presenter Script &mdash; Full Narration (Sandy's Voice)</span>
+        <span class="script-toggle-arrow">&#9660;</span>
+      </button>
+      <div class="script-body" id="scriptBody">
+        <div class="script-content">
+          <div class="script-slide">
+            <div class="script-slide-num">Slide 1 &mdash; Title</div>
+            <div class="script-slide-title">DataDriver Pro &mdash; The Future of AI Sales Automation</div>
+            <div class="script-slide-text">"Welcome to DataDriver Pro. What you're about to see is the most comprehensive AI-powered sales and recruiting system ever built for GoHighLevel. One free install. Full automation. Let me show you how it works."</div>
+          </div>
+          <div class="script-slide">
+            <div class="script-slide-num">Slide 2 &mdash; The Problem</div>
+            <div class="script-slide-title">Manual Prospecting, Data Decay, Missed Follow-Ups</div>
+            <div class="script-slide-text">"Let's be honest about what's broken. Your sales team spends more than half their day on manual prospecting. Your contact lists are decaying at thirty percent a year. Follow-ups slip through the cracks, and every tool you add creates another silo. The result? You're working harder but closing fewer deals. DataDriver Pro fixes all of this."</div>
+          </div>
+          <div class="script-slide">
+            <div class="script-slide-num">Slide 3 &mdash; The Solution</div>
+            <div class="script-slide-title">One Free Install, Full Automation</div>
+            <div class="script-slide-text">"The solution is elegant. One free install from the GHL Marketplace, and you unlock the full DataDriver Pro engine across every sub-account you manage &mdash; even ones you create in the future. No separate login, no migration headaches. It just works inside GHL, right in the sidebar where your team already lives."</div>
+          </div>
+          <div class="script-slide">
+            <div class="script-slide-num">Slide 4 &mdash; Architecture</div>
+            <div class="script-slide-title">How It Works</div>
+            <div class="script-slide-text">"Under the hood, there are four core modules working together. The Intelligence Engine handles all data enrichment and validation. The Sandy AI Fleet provides thirty-six specialized agents for every stage of your pipeline. Smart Audiences lets you build and push targeted lists into GHL with one click. And Sandy Voice and Video handles calls and meetings with a completely natural AI voice. All of this is orchestrated from a single dashboard inside GHL."</div>
+          </div>
+          <div class="script-slide">
+            <div class="script-slide-num">Slide 5 &mdash; Intelligence Engine</div>
+            <div class="script-slide-title">Data Enrichment + Validation</div>
+            <div class="script-slide-text">"The Intelligence Engine is your data backbone. It pulls from multiple proprietary data sources, validates LinkedIn profiles, verifies emails, and assigns a confidence score from zero to one hundred to every single contact. We have over four-point-seven million records ready to process right now &mdash; and that number grows every day. This is the foundation that makes everything else work."</div>
+          </div>
+          <div class="script-slide">
+            <div class="script-slide-num">Slide 6 &mdash; Sandy AI Fleet</div>
+            <div class="script-slide-title">36 Agents, Ethical AI, Autonomous Pipeline</div>
+            <div class="script-slide-text">"Sandy's AI Fleet is where the magic happens. Thirty-six specialized agents, each with a specific role in the pipeline. In the Lite tier, nineteen agents handle the core workflow: gating leads, scanning for fit, building briefs, managing outreach, scheduling meetings, closing deals, and logging everything. Upgrade to Pro and you add thirteen more agents for post-meeting follow-ups, client onboarding, mentorship coaching, and video escalation. Every single agent follows our ethical AI principles &mdash; they're always transparent, always consent-based, and never use pressure tactics."</div>
+          </div>
+          <div class="script-slide">
+            <div class="script-slide-num">Slide 7 &mdash; Smart Audiences</div>
+            <div class="script-slide-title">Build, Clean, Validate, Push</div>
+            <div class="script-slide-text">"Smart Audiences is the Segment Builder. You tell us who you want to reach &mdash; pick an industry, set a location, choose titles and company sizes &mdash; and our AI does the rest. It builds the list, cleans out bad data, validates every contact, and scores them for sales-readiness. Then you push the whole thing into GHL with one click. Auto-tagged, pipeline-assigned, ready for your agents to start working. And you only pay twenty-five cents per enriched contact &mdash; no minimums, no subscriptions."</div>
+          </div>
+          <div class="script-slide">
+            <div class="script-slide-num">Slide 8 &mdash; Voice & Video</div>
+            <div class="script-slide-title">Sandy Handles Calls and Meetings</div>
+            <div class="script-slide-text">"And then there's Sandy herself &mdash; your AI sales assistant. She makes and takes phone calls with a completely natural voice that's indistinguishable from a real person. She can join video meetings as a lifelike avatar on your website. She recognizes returning visitors and greets them by name. When she hits a situation that needs a human touch, she escalates seamlessly to your team. And after every single interaction, she sends personalized follow-up texts and emails automatically."</div>
+          </div>
+          <div class="script-slide">
+            <div class="script-slide-num">Slide 9 &mdash; Pricing</div>
+            <div class="script-slide-title">Three Tiers, No Surprises</div>
+            <div class="script-slide-text">"Pricing is dead simple. The free tier gives you fourteen full days with every feature, every agent, no credit card required. Pro is a one-time payment of four-hundred-ninety-seven dollars for lifetime access &mdash; nineteen agents, the full Intelligence Engine, Smart Audiences, and Sandy Voice. Pro Plus adds all thirty-six agents, video avatar meetings, advanced pipeline features, and priority support for nine-hundred-ninety-seven dollars plus one-ninety-nine per month."</div>
+          </div>
+          <div class="script-slide">
+            <div class="script-slide-num">Slide 10 &mdash; Call to Action</div>
+            <div class="script-slide-title">Install Free from GHL Marketplace</div>
+            <div class="script-slide-text">"So here's the ask. Go to the GHL Marketplace, search DataDriver Pro, and hit install. That's it. Sixty seconds and your account has a full AI sales engine. Fourteen days to try everything. No credit card. No risk. And when you see what Sandy and her agent fleet can do for your pipeline &mdash; and you will see it fast &mdash; upgrade to Pro for lifetime access. Thank you for your time. Let's automate your pipeline."</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="demo-footer">
+  <div class="demo-footer-brand">DATADRIVER PRO</div>
+  <div class="demo-footer-sub">AI-Powered Sales &amp; Recruiting Automation for GoHighLevel</div>
+</footer>
+
+<!-- ===== JAVASCRIPT ===== -->
+<script>
+// ===== HEADER SCROLL =====
+const header = document.getElementById('header');
+window.addEventListener('scroll', () => {
+  header.classList.toggle('scrolled', window.scrollY > 60);
+});
+
+// ===== NAV ACTIVE STATE =====
+const navLinks = document.querySelectorAll('.header-nav a[href^="#"]');
+const sections = document.querySelectorAll('.demo-section, .hero');
+
+function updateActiveNav() {
+  let current = '';
+  sections.forEach(s => {
+    const top = s.getBoundingClientRect().top;
+    if (top <= 200) current = s.id;
+  });
+  navLinks.forEach(link => {
+    link.classList.toggle('active', link.getAttribute('href') === '#' + current);
+  });
+}
+window.addEventListener('scroll', updateActiveNav);
+updateActiveNav();
+
+// ===== SCROLL REVEAL =====
+const reveals = document.querySelectorAll('.reveal');
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+reveals.forEach(el => revealObserver.observe(el));
+
+// ===== ARCHITECTURE DETAIL =====
+const archDetails = {
+  marketplace: {
+    title: 'GHL Marketplace Install',
+    text: '<ul><li>Free install &mdash; no credit card, no commitment</li><li>One click activates DataDriver Pro across your entire GHL account</li><li>Auto-installs in all sub-accounts, including future ones</li><li>Shows up in the GHL sidebar immediately</li></ul>'
+  },
+  trial: {
+    title: '14-Day Full Access Trial',
+    text: '<ul><li>Every feature, every agent, every module &mdash; fully unlocked for 14 days</li><li>No credit card required to start</li><li>After trial, you keep Lite-tier access or upgrade to Pro/Pro+</li><li>All data and configurations persist after trial ends</li></ul>'
+  },
+  dashboard: {
+    title: 'DataDriver Dashboard',
+    text: '<ul><li>Lives inside the GHL sidebar &mdash; no separate login needed</li><li>Real-time agent activity, enrichment pipeline status, and billing</li><li>25-service health monitoring at a glance</li><li>Trial management, tier selection, and account settings</li></ul>'
+  },
+  engine: {
+    title: 'DataDriver Intelligence Engine',
+    text: '<ul><li>Contact enrichment from multiple proprietary data sources</li><li>LinkedIn validation with 0&ndash;100 confidence scoring</li><li>Email verification + company matching</li><li>4.7M+ records ready to process on demand</li><li>Real-time pipeline analytics and throughput monitoring</li></ul>'
+  },
+  agents: {
+    title: 'Sandy AI Agent Fleet',
+    text: '<ul><li>36 autonomous AI agents for sales and recruiting</li><li>Lite tier (19 agents): gate &rarr; scan &rarr; brief &rarr; outreach &rarr; schedule &rarr; close &rarr; log</li><li>Pro tier (+13 agents): post-meeting, onboarding, mentorship, video escalation</li><li>Every agent follows ethical AI principles &mdash; transparent, consent-based, no pressure</li><li>Full audit trail for every agent action</li></ul>'
+  },
+  audiences: {
+    title: 'Smart Audiences (Segment Builder)',
+    text: '<ul><li>Define your ideal audience: industry, location, title, company size</li><li>AI builds, cleans, validates, and scores the list automatically</li><li>One-click push to GHL with auto-tagging and pipeline assignment</li><li>Pay per contact: $0.25 each, no minimums or subscriptions</li><li>Duplicate detection and suppression across campaigns</li></ul>'
+  },
+  voice: {
+    title: 'Sandy &mdash; Voice & Video AI',
+    text: '<ul><li>AI phone calls (inbound + outbound) with natural, human-quality voice</li><li>Video avatar meetings embedded on your website</li><li>Visitor recognition &mdash; personalized greetings for returning contacts</li><li>Automatic escalation to human team members when needed</li><li>SMS and email follow-ups sent automatically after every interaction</li></ul>'
+  }
+};
+
+let activeArchNode = null;
+
+function showArchDetail(key) {
+  const detail = document.getElementById('archDetail');
+  const title = document.getElementById('archDetailTitle');
+  const text = document.getElementById('archDetailText');
+
+  // Deselect previous
+  document.querySelectorAll('.arch-node.active').forEach(n => n.classList.remove('active'));
+
+  if (activeArchNode === key) {
+    detail.classList.remove('visible');
+    activeArchNode = null;
+    return;
+  }
+
+  // Select new
+  const node = document.querySelector(`.arch-node[data-detail="${key}"]`);
+  if (node) node.classList.add('active');
+
+  title.textContent = archDetails[key].title;
+  text.innerHTML = archDetails[key].text;
+  detail.classList.add('visible');
+  activeArchNode = key;
+}
+
+// ===== FEATURE CARDS =====
+function toggleFeature(card) {
+  const wasExpanded = card.classList.contains('expanded');
+  // Close all
+  document.querySelectorAll('.feature-card.expanded').forEach(c => c.classList.remove('expanded'));
+  // Toggle clicked
+  if (!wasExpanded) card.classList.add('expanded');
+}
+
+// ===== SLIDESHOW =====
+let currentSlide = 0;
+const totalSlides = 10;
+
+function initSlides() {
+  const dotsContainer = document.getElementById('slideDots');
+  for (let i = 0; i < totalSlides; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'slide-dot' + (i === 0 ? ' active' : '');
+    dot.onclick = () => goToSlide(i);
+    dotsContainer.appendChild(dot);
+  }
+}
+
+function goToSlide(index) {
+  if (index < 0) index = totalSlides - 1;
+  if (index >= totalSlides) index = 0;
+  currentSlide = index;
+
+  document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.slide-dot').forEach(d => d.classList.remove('active'));
+
+  const slides = document.querySelectorAll('.slide');
+  const dots = document.querySelectorAll('.slide-dot');
+  if (slides[index]) slides[index].classList.add('active');
+  if (dots[index]) dots[index].classList.add('active');
+}
+
+function changeSlide(direction) {
+  goToSlide(currentSlide + direction);
+}
+
+function toggleFullscreen() {
+  const wrap = document.getElementById('slideshow');
+  wrap.classList.toggle('fullscreen');
+}
+
+// Keyboard navigation for slides
+document.addEventListener('keydown', (e) => {
+  const wrap = document.getElementById('slideshow');
+  if (e.key === 'ArrowRight' || e.key === ' ') {
+    if (wrap.classList.contains('fullscreen') || isElementInViewport(wrap)) {
+      e.preventDefault();
+      changeSlide(1);
+    }
+  }
+  if (e.key === 'ArrowLeft') {
+    if (wrap.classList.contains('fullscreen') || isElementInViewport(wrap)) {
+      e.preventDefault();
+      changeSlide(-1);
+    }
+  }
+  if (e.key === 'Escape') {
+    wrap.classList.remove('fullscreen');
+  }
+});
+
+function isElementInViewport(el) {
+  const rect = el.getBoundingClientRect();
+  return rect.top < window.innerHeight && rect.bottom > 0;
+}
+
+initSlides();
+
+// ===== PRESENTER SCRIPT =====
+function toggleScript() {
+  const toggle = document.getElementById('scriptToggle');
+  const body = document.getElementById('scriptBody');
+  toggle.classList.toggle('open');
+  body.classList.toggle('open');
+}
+
+// ===== ANIMATED COUNTERS =====
+function animateCounters() {
+  const statEl = document.getElementById('statAgents');
+  let count = 0;
+  const target = 36;
+  const duration = 1500;
+  const stepTime = duration / target;
+
+  const interval = setInterval(() => {
+    count++;
+    statEl.textContent = count;
+    if (count >= target) clearInterval(interval);
+  }, stepTime);
+}
+
+// Run counter animation when hero is visible
+const heroObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      animateCounters();
+      heroObserver.disconnect();
+    }
+  });
+}, { threshold: 0.5 });
+
+heroObserver.observe(document.getElementById('hero'));
+</script>
+</body>
+</html>
