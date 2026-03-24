@@ -1833,6 +1833,113 @@ const heroObserver = new IntersectionObserver((entries) => {
 
 heroObserver.observe(document.getElementById('hero'));
 </script>
+
+<!-- Slide Audio Player -->
+<div id="slide-audio-container" style="position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:10001;display:none;background:rgba(10,10,10,0.95);border:1px solid #1a1a1a;border-radius:12px;padding:10px 20px;backdrop-filter:blur(10px);align-items:center;gap:12px;">
+  <button id="audio-play-btn" onclick="toggleSlideAudio()" style="background:none;border:none;cursor:pointer;color:#00E5FF;font-size:20px;">&#9654;</button>
+  <span id="audio-label" style="color:#888;font-size:12px;font-family:Montserrat,sans-serif;">Sandy narrating...</span>
+  <div style="width:200px;height:4px;background:#1a1a1a;border-radius:2px;overflow:hidden;">
+    <div id="audio-progress" style="width:0%;height:100%;background:linear-gradient(90deg,#00E5FF,#4ADE80,#FACC15);border-radius:2px;transition:width 0.3s;"></div>
+  </div>
+  <span id="audio-time" style="color:#666;font-size:11px;font-family:monospace;">0:00</span>
+</div>
+<audio id="slide-audio" preload="auto"></audio>
+<script>
+const slideAudioFiles = {
+  0: '/audio/slide1.mp3',
+  1: '/audio/slide2.mp3',
+  2: '/audio/slide3.mp3',
+  3: '/audio/slide4.mp3',
+  4: '/audio/slide5.mp3',
+  5: '/audio/slide6.mp3',
+  6: '/audio/slide7.mp3',
+  7: '/audio/slide8.mp3',
+  8: '/audio/slide9.mp3',
+  9: '/audio/slide10.mp3'
+};
+const slideAudio = document.getElementById('slide-audio');
+const audioContainer = document.getElementById('slide-audio-container');
+const audioPlayBtn = document.getElementById('audio-play-btn');
+const audioProgress = document.getElementById('audio-progress');
+const audioTime = document.getElementById('audio-time');
+let audioAutoplay = true;
+
+function loadSlideAudio(slideIndex) {
+  const src = slideAudioFiles[slideIndex];
+  if (!src) return;
+  slideAudio.pause();
+  slideAudio.src = src;
+  audioContainer.style.display = 'flex';
+  audioPlayBtn.innerHTML = '&#9654;';
+  audioProgress.style.width = '0%';
+  audioTime.textContent = '0:00';
+  if (audioAutoplay) {
+    slideAudio.play().catch(() => {});
+    audioPlayBtn.innerHTML = '&#9646;&#9646;';
+  }
+}
+
+function toggleSlideAudio() {
+  if (slideAudio.paused) {
+    slideAudio.play();
+    audioPlayBtn.innerHTML = '&#9646;&#9646;';
+  } else {
+    slideAudio.pause();
+    audioPlayBtn.innerHTML = '&#9654;';
+  }
+}
+
+slideAudio.addEventListener('timeupdate', () => {
+  if (slideAudio.duration) {
+    const pct = (slideAudio.currentTime / slideAudio.duration) * 100;
+    audioProgress.style.width = pct + '%';
+    const mins = Math.floor(slideAudio.currentTime / 60);
+    const secs = Math.floor(slideAudio.currentTime % 60);
+    audioTime.textContent = mins + ':' + (secs < 10 ? '0' : '') + secs;
+  }
+});
+
+slideAudio.addEventListener('play', () => { audioPlayBtn.innerHTML = '&#9646;&#9646;'; });
+slideAudio.addEventListener('pause', () => { audioPlayBtn.innerHTML = '&#9654;'; });
+slideAudio.addEventListener('ended', () => { audioPlayBtn.innerHTML = '&#9654;'; audioProgress.style.width = '100%'; });
+
+// Hook into existing slide navigation
+const origGoToSlide = window.goToSlide;
+if (typeof origGoToSlide === 'function') {
+  window.goToSlide = function(idx) {
+    origGoToSlide(idx);
+    loadSlideAudio(idx);
+  };
+}
+
+// Also patch nextSlide/prevSlide if they exist
+const _origNext = window.nextSlide;
+const _origPrev = window.prevSlide;
+if (typeof _origNext === 'function') {
+  window.nextSlide = function() { _origNext(); loadSlideAudio(window.currentSlide || 0); };
+}
+if (typeof _origPrev === 'function') {
+  window.prevSlide = function() { _origPrev(); loadSlideAudio(window.currentSlide || 0); };
+}
+
+// Show audio controls when slideshow section is visible
+const slideshowObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      audioContainer.style.display = 'flex';
+    } else {
+      audioContainer.style.display = 'none';
+      slideAudio.pause();
+    }
+  });
+}, { threshold: 0.3 });
+
+document.addEventListener('DOMContentLoaded', () => {
+  const slideshowWrap = document.querySelector('.slideshow-wrap');
+  if (slideshowWrap) slideshowObserver.observe(slideshowWrap);
+});
+</script>
+
 </body>
 </html>
 <!-- force redeploy 1774332756 -->
