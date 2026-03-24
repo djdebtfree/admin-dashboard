@@ -12,17 +12,17 @@
 
 :root {
   --bg: #000000;
-  --text: #FFFFFF;
-  --text-muted: #AAAAAA;
-  --accent-blue: #007BFF;
-  --accent-yellow: #F5FF00;
-  --gradient: linear-gradient(135deg, #007BFF, #F5FF00);
-  --healthy: #00FF88;
-  --unhealthy: #FF4444;
+  --text: #ffffff;
+  --text-muted: #888888;
+  --accent-blue: #00E5FF;
+  --accent-yellow: #FACC15;
+  --gradient: linear-gradient(135deg, #00E5FF, #4ADE80, #FACC15);
+  --healthy: #4ADE80;
+  --unhealthy: #EF4444;
   --unknown: #666666;
-  --card-bg: #111111;
-  --card-border: #222222;
-  --card-hover: #1a1a1a;
+  --card-bg: #0a0a0a;
+  --card-border: #1a1a1a;
+  --card-hover: #111111;
   --font: 'Montserrat', sans-serif;
 }
 
@@ -85,19 +85,20 @@ body {
   align-items: center;
   gap: 6px;
 }
-.btn:hover { border-color: var(--accent-blue); background: #1a1a2a; }
+.btn:hover { border-color: var(--accent-blue); background: rgba(0,229,255,0.08); }
 .btn-primary {
   background: var(--accent-blue);
   border-color: var(--accent-blue);
-  color: #fff;
+  color: #000;
+  font-weight: 700;
 }
-.btn-primary:hover { background: #0069d9; }
+.btn-primary:hover { background: #00c8e0; }
 .btn-secondary {
   background: transparent;
   border-color: var(--accent-yellow);
   color: var(--accent-yellow);
 }
-.btn-secondary:hover { background: rgba(245,255,0,0.08); }
+.btn-secondary:hover { background: rgba(250,204,21,0.08); }
 
 /* ===== MAIN ===== */
 .main {
@@ -134,6 +135,13 @@ body {
 }
 .section-header:hover { background: var(--card-hover); }
 
+.config-section:hover {
+  border-color: transparent;
+  background-image: linear-gradient(#0a0a0a, #0a0a0a), linear-gradient(135deg, #00E5FF, #4ADE80, #FACC15);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+}
+
 .section-left {
   display: flex;
   align-items: center;
@@ -154,7 +162,7 @@ body {
   font-weight: 600;
   padding: 2px 8px;
   border-radius: 10px;
-  background: rgba(0,123,255,0.15);
+  background: rgba(0,229,255,0.15);
   color: var(--accent-blue);
 }
 
@@ -286,17 +294,17 @@ body {
   transform: translateX(0);
 }
 .toast.success {
-  background: rgba(0,255,136,0.12);
+  background: rgba(74,222,128,0.12);
   border: 1px solid var(--healthy);
   color: var(--healthy);
 }
 .toast.error {
-  background: rgba(255,68,68,0.12);
+  background: rgba(239,68,68,0.12);
   border: 1px solid var(--unhealthy);
   color: var(--unhealthy);
 }
 .toast.info {
-  background: rgba(0,123,255,0.12);
+  background: rgba(0,229,255,0.12);
   border: 1px solid var(--accent-blue);
   color: var(--accent-blue);
 }
@@ -396,6 +404,7 @@ body {
   height: 36px;
   border: 3px solid var(--card-border);
   border-top-color: var(--accent-blue);
+  border-right-color: var(--healthy);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -422,9 +431,12 @@ body {
 <!-- HEADER -->
 <header class="header">
   <div class="header-top">
-    <div class="header-title">DATA DRIVER PRO — System Setup</div>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <img src="/dd-logo.png" height="40" alt="DataDriver Pro">
+      <div class="header-title">System Setup</div>
+    </div>
     <div class="header-controls">
-      <a href="/" class="btn">&#8592; Dashboard</a>
+      <a href="/" class="btn" style="color:var(--accent-blue);">&#8592; Dashboard</a>
     </div>
   </div>
 </header>

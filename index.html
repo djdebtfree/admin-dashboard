@@ -12,20 +12,20 @@
 
 :root {
   --bg: #000000;
-  --text: #FFFFFF;
-  --text-muted: #AAAAAA;
-  --accent-blue: #007BFF;
-  --accent-yellow: #F5FF00;
-  --gradient: linear-gradient(135deg, #007BFF, #F5FF00);
-  --healthy: #00FF88;
-  --unhealthy: #FF4444;
+  --text: #ffffff;
+  --text-muted: #888888;
+  --accent-blue: #00E5FF;
+  --accent-yellow: #FACC15;
+  --gradient: linear-gradient(135deg, #00E5FF, #4ADE80, #FACC15);
+  --healthy: #4ADE80;
+  --unhealthy: #EF4444;
   --unknown: #666666;
   --not-deployed: #FF8800;
   --planned: #9966FF;
-  --config-needed: #FFAA00;
-  --card-bg: #111111;
-  --card-border: #222222;
-  --card-hover: #1a1a1a;
+  --config-needed: #FACC15;
+  --card-bg: #0a0a0a;
+  --card-border: #1a1a1a;
+  --card-hover: #111111;
   --font: 'Montserrat', sans-serif;
 }
 
@@ -91,9 +91,9 @@ body {
   cursor: pointer;
   transition: all 0.15s;
 }
-.btn:hover { border-color: var(--accent-blue); background: #1a1a2a; }
+.btn:hover { border-color: var(--accent-blue); background: rgba(0,229,255,0.08); }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.btn.active { border-color: var(--accent-blue); background: rgba(0,123,255,0.15); color: var(--accent-blue); }
+.btn.active { border-color: var(--accent-blue); background: rgba(0,229,255,0.15); color: var(--accent-blue); }
 .btn-action {
   font-family: var(--font);
   font-size: 11px;
@@ -106,7 +106,7 @@ body {
   cursor: pointer;
   transition: all 0.15s;
 }
-.btn-action:hover { background: rgba(0,123,255,0.1); border-color: var(--accent-blue); }
+.btn-action:hover { background: rgba(0,229,255,0.1); border-color: var(--accent-blue); }
 .btn-action:disabled { opacity: 0.4; cursor: not-allowed; }
 .btn-action.running { color: var(--accent-yellow); border-color: var(--accent-yellow); }
 
@@ -185,7 +185,12 @@ body {
   position: relative;
   overflow: hidden;
 }
-.card:hover { border-color: #333; background: var(--card-hover); }
+.card:hover {
+  border-color: transparent;
+  background-image: linear-gradient(#0a0a0a, #0a0a0a), linear-gradient(135deg, #00E5FF, #4ADE80, #FACC15);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+}
 .card::before {
   content: '';
   position: absolute;
@@ -481,14 +486,17 @@ body {
 <!-- HEADER -->
 <header class="header">
   <div class="header-top">
-    <div class="header-title">DATA DRIVER PRO — Admin Dashboard</div>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <img src="/dd-logo.png" height="40" alt="DataDriver Pro">
+      <div class="header-title">Admin Dashboard</div>
+    </div>
     <div class="header-controls">
       <span class="header-status" id="masterStatus"><span id="healthyCount">0</span>/<span id="totalCount">25</span> services healthy</span>
       <button class="btn" id="btnSettings" onclick="toggleSettings()">Settings</button>
       <button class="btn" id="btnAutoRefresh" onclick="toggleAutoRefresh()">Auto-refresh: ON</button>
       <button class="btn" onclick="loadRemoteConfig().then(() => { renderSections(); refreshAll(); })">Sync Keys</button>
       <button class="btn" onclick="refreshAll()">Refresh All</button>
-      <a href="/setup" class="btn" title="System Setup" style="font-size:16px;padding:5px 10px;">&#9881;</a>
+      <a href="/setup" class="btn" title="System Setup" style="font-size:16px;padding:5px 10px;color:var(--accent-blue);">&#9881;</a>
     </div>
   </div>
   <div class="progress-bar-wrap">
