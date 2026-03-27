@@ -478,6 +478,263 @@ body {
   .section-grid { grid-template-columns: 1fr; }
   .settings-row { flex-direction: column; align-items: stretch; }
   .settings-label { min-width: auto; }
+  .drilldown-panel { width: 100vw !important; }
+}
+
+/* ===== CARD CLICKABLE ===== */
+.card { cursor: pointer; }
+
+/* ===== DRILL-DOWN PANEL ===== */
+.drilldown-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 200;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.drilldown-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+.drilldown-backdrop {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+}
+.drilldown-panel {
+  position: absolute;
+  top: 0; right: 0;
+  width: 420px;
+  height: 100%;
+  background: #0a0a0a;
+  border-left: 1px solid var(--card-border);
+  overflow-y: auto;
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.drilldown-overlay.open .drilldown-panel {
+  transform: translateX(0);
+}
+
+.dd-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--card-border);
+  position: sticky;
+  top: 0;
+  background: #0a0a0a;
+  z-index: 10;
+}
+.dd-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.dd-header-icon { font-size: 24px; }
+.dd-header-name { font-size: 16px; font-weight: 700; }
+.dd-close {
+  background: none; border: none; color: var(--text-muted);
+  font-size: 20px; cursor: pointer; padding: 4px 8px; border-radius: 4px;
+}
+.dd-close:hover { color: var(--text); background: var(--card-bg); }
+
+.dd-status-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--card-border);
+  font-size: 12px; font-weight: 600;
+}
+.dd-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.dd-status-badge.healthy { background: rgba(0,255,136,0.1); color: var(--healthy); }
+.dd-status-badge.unhealthy { background: rgba(255,68,68,0.1); color: var(--unhealthy); }
+.dd-status-badge.unknown { background: rgba(102,102,102,0.1); color: var(--unknown); }
+.dd-status-badge.cors-blocked { background: rgba(255,136,0,0.1); color: var(--not-deployed); }
+.dd-status-badge.checking { background: rgba(245,255,0,0.1); color: var(--accent-yellow); }
+.dd-status-badge.not-deployed { background: rgba(255,136,0,0.1); color: var(--not-deployed); }
+.dd-status-badge.config-needed { background: rgba(255,170,0,0.1); color: var(--config-needed); }
+.dd-status-badge.planned { background: rgba(153,102,255,0.1); color: var(--planned); }
+.dd-status-badge.error { background: rgba(255,68,68,0.1); color: var(--unhealthy); }
+.dd-status-badge.timeout { background: rgba(255,68,68,0.1); color: var(--unhealthy); }
+
+.dd-section {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--card-border);
+}
+.dd-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--accent-blue);
+  margin-bottom: 12px;
+}
+
+.dd-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.dd-metric {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: 12px;
+}
+.dd-metric-label {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+.dd-metric-value {
+  font-size: 22px;
+  font-weight: 800;
+}
+.dd-metric-value.good { color: var(--healthy); }
+.dd-metric-value.warn { color: var(--accent-yellow); }
+.dd-metric-value.bad { color: var(--unhealthy); }
+.dd-metric-sub {
+  font-size: 10px;
+  color: var(--unknown);
+  margin-top: 2px;
+}
+
+.dd-uptime-bar-wrap {
+  height: 6px;
+  background: var(--card-border);
+  border-radius: 3px;
+  margin-top: 6px;
+  overflow: hidden;
+}
+.dd-uptime-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s;
+}
+
+.dd-key-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  padding: 10px 12px;
+}
+.dd-key-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  min-width: 100px;
+}
+.dd-key-value {
+  flex: 1;
+  font-family: 'SFMono-Regular', 'Consolas', monospace;
+  font-size: 12px;
+  color: var(--text);
+  word-break: break-all;
+}
+.dd-key-missing {
+  color: var(--unhealthy);
+  font-size: 11px;
+  font-weight: 600;
+}
+.dd-key-btn {
+  background: none;
+  border: 1px solid var(--card-border);
+  color: var(--text-muted);
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: var(--font);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.dd-key-btn:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
+
+.dd-issue {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  border-left: 3px solid var(--unknown);
+}
+.dd-issue.fail { border-left-color: var(--unhealthy); }
+.dd-issue.slow { border-left-color: var(--accent-yellow); }
+.dd-issue.ok { border-left-color: var(--healthy); }
+.dd-issue-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+.dd-issue-status {
+  font-size: 11px;
+  font-weight: 700;
+}
+.dd-issue-status.fail { color: var(--unhealthy); }
+.dd-issue-status.slow { color: var(--accent-yellow); }
+.dd-issue-status.ok { color: var(--healthy); }
+.dd-issue-time {
+  font-size: 10px;
+  color: var(--unknown);
+}
+.dd-issue-detail {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.dd-no-issues {
+  text-align: center;
+  padding: 16px;
+  color: var(--unknown);
+  font-size: 12px;
+}
+
+.dd-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.dd-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent-blue);
+  text-decoration: none;
+  padding: 5px 10px;
+  border: 1px solid var(--card-border);
+  border-radius: 5px;
+  background: var(--card-bg);
+  transition: all 0.15s;
+}
+.dd-link:hover { border-color: var(--accent-blue); background: rgba(0,123,255,0.08); }
+
+.dd-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 </style>
 </head>
@@ -537,6 +794,44 @@ body {
 
   <!-- SECTIONS RENDERED BY JS -->
   <div id="sectionsContainer"></div>
+
+  <!-- DRILL-DOWN PANEL -->
+  <div class="drilldown-overlay" id="drilldownOverlay">
+    <div class="drilldown-backdrop" onclick="closeDrilldown()"></div>
+    <div class="drilldown-panel" id="drilldownPanel">
+      <div class="dd-header">
+        <div class="dd-header-left">
+          <span class="dd-header-icon" id="ddIcon"></span>
+          <span class="dd-header-name" id="ddName"></span>
+        </div>
+        <button class="dd-close" onclick="closeDrilldown()">&times;</button>
+      </div>
+      <div class="dd-status-bar">
+        <span class="dd-status-badge" id="ddStatusBadge"></span>
+        <span id="ddDesc" style="color:var(--text-muted);font-size:11px;"></span>
+      </div>
+      <div class="dd-section">
+        <div class="dd-section-title">Health Metrics</div>
+        <div class="dd-metrics" id="ddMetrics"></div>
+      </div>
+      <div class="dd-section" id="ddKeysSection">
+        <div class="dd-section-title">API Keys</div>
+        <div id="ddKeys"></div>
+      </div>
+      <div class="dd-section">
+        <div class="dd-section-title">Recent Checks</div>
+        <div id="ddIssues"></div>
+      </div>
+      <div class="dd-section" id="ddLinksSection">
+        <div class="dd-section-title">Quick Links</div>
+        <div class="dd-links" id="ddLinks"></div>
+      </div>
+      <div class="dd-section" id="ddActionsSection">
+        <div class="dd-section-title">Actions</div>
+        <div class="dd-actions" id="ddActions"></div>
+      </div>
+    </div>
+  </div>
 
   <!-- ACTIVITY LOG -->
   <div class="log-section">
@@ -856,10 +1151,12 @@ let serviceStates = {};
 let autoRefreshEnabled = true;
 let autoRefreshTimer = null;
 let logEntries = [];
+let healthHistory = {}; // { serviceId: [{ time, status, statusCode, responseTime, error }, ...] }
 
 // ===== INIT =====
 async function init() {
   loadSettings();
+  loadHealthHistory();
   renderSettingsPanel();
   renderSections();
   await loadRemoteConfig();
@@ -867,6 +1164,16 @@ async function init() {
   startAutoRefresh();
   addLogEntry('Dashboard initialized. Starting health checks...', 'info');
   refreshAll();
+}
+
+function attachCardClickHandlers() {
+  document.querySelectorAll('.card').forEach(card => {
+    const svcId = card.id.replace('card-', '');
+    card.onclick = (e) => {
+      if (e.target.closest('.btn-action, .card-url, .card-github, .card-result-close, a, button')) return;
+      openDrilldown(svcId);
+    };
+  });
 }
 
 // ===== SETTINGS =====
@@ -1072,6 +1379,8 @@ function renderSections() {
     `;
     container.appendChild(div);
   });
+  attachCardClickHandlers();
+  if (currentDrilldownId) openDrilldown(currentDrilldownId);
 }
 
 function renderCard(svc) {
@@ -1180,11 +1489,9 @@ async function healthCheck(svc) {
 
   // If the service needs an API key and none is configured, show config-needed
   if (svc.needsApiKey && !getApiKey(svc.needsApiKey)) {
-    updateServiceStatus(svc.id, {
-      status: 'config-needed',
-      lastChecked: new Date(),
-      note: `Missing API key: ${svc.needsApiKey}`
-    });
+    const keyResult = { status: 'config-needed', lastChecked: new Date(), note: `Missing API key: ${svc.needsApiKey}` };
+    updateServiceStatus(svc.id, keyResult);
+    recordHealthCheck(svc.id, keyResult);
     addLogEntry(`${svc.name}: needs API key (${svc.needsApiKey})`, 'warning');
     renderSections();
     updateMasterStatus();
@@ -1209,45 +1516,30 @@ async function healthCheck(svc) {
     const result = await response.json();
 
     if (result.status === 'healthy') {
-      updateServiceStatus(svc.id, {
-        status: 'healthy',
-        statusCode: result.statusCode,
-        responseTime: result.responseTime,
-        lastChecked: new Date()
-      });
+      const hc = { status: 'healthy', statusCode: result.statusCode, responseTime: result.responseTime, lastChecked: new Date() };
+      updateServiceStatus(svc.id, hc);
+      recordHealthCheck(svc.id, hc);
       addLogEntry(`${svc.name}: healthy ${result.statusCode} (${result.responseTime}ms)`, 'success');
     } else if (result.status === 'timeout') {
-      updateServiceStatus(svc.id, {
-        status: 'timeout',
-        responseTime: result.responseTime,
-        lastChecked: new Date(),
-        error: result.error || 'Request timed out'
-      });
+      const hc = { status: 'timeout', responseTime: result.responseTime, lastChecked: new Date(), error: result.error || 'Request timed out' };
+      updateServiceStatus(svc.id, hc);
+      recordHealthCheck(svc.id, hc);
       addLogEntry(`${svc.name}: TIMEOUT after ${result.responseTime}ms`, 'error');
     } else if (result.status === 'error') {
-      updateServiceStatus(svc.id, {
-        status: 'error',
-        lastChecked: new Date(),
-        error: result.error || 'Connection failed'
-      });
+      const hc = { status: 'error', lastChecked: new Date(), error: result.error || 'Connection failed' };
+      updateServiceStatus(svc.id, hc);
+      recordHealthCheck(svc.id, hc);
       addLogEntry(`${svc.name}: ERROR - ${result.error}`, 'error');
     } else {
-      // unhealthy (non-2xx)
-      updateServiceStatus(svc.id, {
-        status: 'unhealthy',
-        statusCode: result.statusCode,
-        responseTime: result.responseTime,
-        lastChecked: new Date()
-      });
+      const hc = { status: 'unhealthy', statusCode: result.statusCode, responseTime: result.responseTime, lastChecked: new Date() };
+      updateServiceStatus(svc.id, hc);
+      recordHealthCheck(svc.id, hc);
       addLogEntry(`${svc.name}: unhealthy ${result.statusCode} (${result.responseTime}ms)`, 'error');
     }
   } catch (proxyErr) {
-    // The proxy itself failed (unlikely unless Netlify is down)
-    updateServiceStatus(svc.id, {
-      status: 'error',
-      lastChecked: new Date(),
-      error: 'Proxy error: ' + proxyErr.message
-    });
+    const hc = { status: 'error', lastChecked: new Date(), error: 'Proxy error: ' + proxyErr.message };
+    updateServiceStatus(svc.id, hc);
+    recordHealthCheck(svc.id, hc);
     addLogEntry(`${svc.name}: PROXY ERROR - ${proxyErr.message}`, 'error');
   }
 
@@ -1309,6 +1601,19 @@ async function refreshAll() {
 
 function updateServiceStatus(id, state) {
   serviceStates[id] = { ...(serviceStates[id] || {}), ...state };
+  // Record to health history if this is a completed check (not just 'checking')
+  if (state.status && state.status !== 'checking') {
+    if (!healthHistory[id]) healthHistory[id] = [];
+    healthHistory[id].unshift({
+      time: new Date().toISOString(),
+      status: state.status,
+      statusCode: state.statusCode || null,
+      responseTime: state.responseTime || null,
+      error: state.error || null
+    });
+    if (healthHistory[id].length > 20) healthHistory[id] = healthHistory[id].slice(0, 20);
+    saveHealthHistory();
+  }
 }
 
 function updateMasterStatus() {
@@ -1492,6 +1797,278 @@ function escapeHtml(str) {
 
 function escapeAttr(str) {
   return String(str || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// ===== HEALTH HISTORY (sessionStorage) =====
+let healthHistory = {};
+
+function loadHealthHistory() {
+  try {
+    const saved = sessionStorage.getItem('ddpro-health-history');
+    if (saved) healthHistory = JSON.parse(saved);
+  } catch (e) { healthHistory = {}; }
+}
+
+function saveHealthHistory() {
+  try { sessionStorage.setItem('ddpro-health-history', JSON.stringify(healthHistory)); } catch (e) {}
+}
+
+function recordHealthCheck(serviceId, result) {
+  if (!healthHistory[serviceId]) healthHistory[serviceId] = [];
+  healthHistory[serviceId].push({
+    ts: Date.now(),
+    status: result.status,
+    statusCode: result.statusCode || null,
+    responseTime: result.responseTime || null,
+    error: result.error || null,
+    note: result.note || null
+  });
+  if (healthHistory[serviceId].length > 50) healthHistory[serviceId] = healthHistory[serviceId].slice(-50);
+  saveHealthHistory();
+}
+
+function getUptime(serviceId) {
+  const history = healthHistory[serviceId] || [];
+  if (history.length === 0) return null;
+  const good = history.filter(h => h.status === 'healthy' || h.status === 'cors-blocked').length;
+  return ((good / history.length) * 100).toFixed(1);
+}
+
+function getAvgResponseTime(serviceId) {
+  const history = healthHistory[serviceId] || [];
+  const withTime = history.filter(h => h.responseTime);
+  if (withTime.length === 0) return null;
+  return Math.round(withTime.reduce((sum, h) => sum + h.responseTime, 0) / withTime.length);
+}
+
+function getRecentChecks(serviceId, count) {
+  return (healthHistory[serviceId] || []).slice(-count).reverse();
+}
+
+// ===== DRILL-DOWN PANEL =====
+let currentDrilldownId = null;
+
+function openDrilldown(serviceId) {
+  const svc = SERVICES.find(s => s.id === serviceId);
+  if (!svc) return;
+  currentDrilldownId = serviceId;
+  const state = serviceStates[serviceId] || {};
+  const status = getEffectiveStatus(svc, state);
+
+  document.getElementById('ddIcon').textContent = svc.icon;
+  document.getElementById('ddName').textContent = svc.name;
+  document.getElementById('ddDesc').textContent = svc.description;
+
+  const badge = document.getElementById('ddStatusBadge');
+  badge.className = 'dd-status-badge ' + status;
+  badge.innerHTML = '<span class="status-dot ' + status + '"></span> ' + getStatusLabel(status, state);
+
+  const uptime = getUptime(serviceId);
+  const avgRT = getAvgResponseTime(serviceId);
+  const currentRT = state.responseTime || null;
+  const checks = (healthHistory[serviceId] || []).length;
+
+  let uptimeClass = 'good';
+  if (uptime !== null) {
+    if (parseFloat(uptime) < 95) uptimeClass = 'bad';
+    else if (parseFloat(uptime) < 99) uptimeClass = 'warn';
+  }
+
+  let rtClass = 'good';
+  if (currentRT) {
+    if (currentRT > 500) rtClass = 'bad';
+    else if (currentRT > 200) rtClass = 'warn';
+  }
+
+  let uptimeBarColor = 'var(--healthy)';
+  if (uptimeClass === 'warn') uptimeBarColor = 'var(--accent-yellow)';
+  if (uptimeClass === 'bad') uptimeBarColor = 'var(--unhealthy)';
+
+  document.getElementById('ddMetrics').innerHTML = `
+    <div class="dd-metric">
+      <div class="dd-metric-label">Response Time</div>
+      <div class="dd-metric-value ${rtClass}">${currentRT ? currentRT + '<span style="font-size:12px;font-weight:500;">ms</span>' : '\u2014'}</div>
+      <div class="dd-metric-sub">${avgRT ? 'Avg: ' + avgRT + 'ms' : 'No data yet'}</div>
+    </div>
+    <div class="dd-metric">
+      <div class="dd-metric-label">Uptime</div>
+      <div class="dd-metric-value ${uptimeClass}">${uptime !== null ? uptime + '<span style="font-size:12px;font-weight:500;">%</span>' : '\u2014'}</div>
+      <div class="dd-uptime-bar-wrap">
+        <div class="dd-uptime-bar-fill" style="width:${uptime || 0}%;background:${uptimeBarColor}"></div>
+      </div>
+      <div class="dd-metric-sub">${checks} check${checks !== 1 ? 's' : ''} recorded</div>
+    </div>
+    <div class="dd-metric">
+      <div class="dd-metric-label">HTTP Status</div>
+      <div class="dd-metric-value${state.statusCode && state.statusCode >= 400 ? ' bad' : state.statusCode ? ' good' : ''}">${state.statusCode || '\u2014'}</div>
+      <div class="dd-metric-sub">${state.lastChecked ? 'Checked ' + timeAgo(state.lastChecked) : 'Not checked'}</div>
+    </div>
+    <div class="dd-metric">
+      <div class="dd-metric-label">Total Checks</div>
+      <div class="dd-metric-value">${checks}</div>
+      <div class="dd-metric-sub">${checks > 0 ? 'Since page load' : 'Waiting...'}</div>
+    </div>
+  `;
+
+  // API Keys
+  const keysSection = document.getElementById('ddKeysSection');
+  const keysContainer = document.getElementById('ddKeys');
+  const relevantKeys = findServiceKeys(svc);
+  if (relevantKeys.length > 0) {
+    keysSection.style.display = '';
+    keysContainer.innerHTML = relevantKeys.map(k => {
+      const val = getApiKey(k.id);
+      if (!val) {
+        return `<div class="dd-key-row">
+          <span class="dd-key-label">${escapeHtml(k.label)}</span>
+          <span class="dd-key-missing">NOT CONFIGURED</span>
+        </div>`;
+      }
+      const masked = maskKey(val);
+      return `<div class="dd-key-row">
+        <span class="dd-key-label">${escapeHtml(k.label)}</span>
+        <span class="dd-key-value" id="dd-keyval-${k.id}">${escapeHtml(masked)}</span>
+        <button class="dd-key-btn" onclick="toggleKeyReveal('${k.id}')">Reveal</button>
+        <button class="dd-key-btn" onclick="copyKey('${k.id}')">Copy</button>
+      </div>`;
+    }).join('');
+  } else {
+    keysSection.style.display = 'none';
+  }
+
+  // Recent Checks
+  const issuesContainer = document.getElementById('ddIssues');
+  const recent = getRecentChecks(serviceId, 10);
+  if (recent.length > 0) {
+    issuesContainer.innerHTML = recent.map(h => {
+      const isFail = h.status === 'unhealthy' || h.status === 'error' || h.status === 'timeout';
+      const isSlow = h.responseTime && h.responseTime > 500;
+      const cls = isFail ? 'fail' : isSlow ? 'slow' : 'ok';
+      const statusText = isFail ? (h.status === 'timeout' ? 'TIMEOUT' : 'FAILED') : isSlow ? 'SLOW' : 'OK';
+      const ago = timeAgo(new Date(h.ts));
+      let detail = '';
+      if (h.statusCode) detail += 'HTTP ' + h.statusCode;
+      if (h.responseTime) detail += (detail ? ' \u00b7 ' : '') + h.responseTime + 'ms';
+      if (h.error) detail += (detail ? ' \u00b7 ' : '') + h.error;
+      if (h.note) detail += (detail ? ' \u00b7 ' : '') + h.note;
+      return `<div class="dd-issue ${cls}">
+        <div class="dd-issue-head">
+          <span class="dd-issue-status ${cls}">${statusText}</span>
+          <span class="dd-issue-time">${ago}</span>
+        </div>
+        <div class="dd-issue-detail">${escapeHtml(detail || 'No details')}</div>
+      </div>`;
+    }).join('');
+  } else {
+    issuesContainer.innerHTML = '<div class="dd-no-issues">No checks recorded yet. Run a health check first.</div>';
+  }
+
+  // Quick Links
+  const linksSection = document.getElementById('ddLinksSection');
+  const linksContainer = document.getElementById('ddLinks');
+  let linksHtml = '';
+  const url = getServiceUrl(svc);
+  if (url) linksHtml += `<a class="dd-link" href="${escapeAttr(url)}" target="_blank" rel="noopener">Open URL</a>`;
+  if (svc.githubRepo) linksHtml += `<a class="dd-link" href="https://github.com/${escapeAttr(svc.githubRepo)}" target="_blank" rel="noopener">GitHub</a>`;
+  if (url && svc.healthEndpoint) linksHtml += `<a class="dd-link" href="${escapeAttr(url + svc.healthEndpoint)}" target="_blank" rel="noopener">Health Endpoint</a>`;
+  if (linksHtml) {
+    linksSection.style.display = '';
+    linksContainer.innerHTML = linksHtml;
+  } else {
+    linksSection.style.display = 'none';
+  }
+
+  // Actions
+  const actionsSection = document.getElementById('ddActionsSection');
+  const actionsContainer = document.getElementById('ddActions');
+  if (svc.actions && svc.actions.length > 0 && url) {
+    actionsSection.style.display = '';
+    actionsContainer.innerHTML = svc.actions.map((a, i) =>
+      `<button class="btn-action" id="dd-action-${svc.id}-${i}" onclick="executeDrilldownAction('${svc.id}', ${i})">${a.label}</button>`
+    ).join('');
+  } else {
+    actionsSection.style.display = 'none';
+  }
+
+  document.getElementById('drilldownOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeDrilldown() {
+  document.getElementById('drilldownOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+  currentDrilldownId = null;
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && currentDrilldownId) closeDrilldown();
+});
+
+function findServiceKeys(svc) {
+  const keys = [];
+  if (svc.needsApiKey) {
+    const keyConfig = CONFIGURABLE_KEYS.find(k => k.id === svc.needsApiKey);
+    if (keyConfig) keys.push(keyConfig);
+    else keys.push({ id: svc.needsApiKey, label: svc.needsApiKey });
+  }
+  return keys;
+}
+
+function maskKey(val) {
+  if (!val) return '';
+  if (val.length <= 8) return '\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022';
+  return val.substring(0, 6) + '\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022' + val.substring(val.length - 4);
+}
+
+let revealedKeys = {};
+function toggleKeyReveal(keyId) {
+  const el = document.getElementById('dd-keyval-' + keyId);
+  if (!el) return;
+  const val = getApiKey(keyId);
+  if (!val) return;
+  if (revealedKeys[keyId]) {
+    el.textContent = maskKey(val);
+    revealedKeys[keyId] = false;
+  } else {
+    el.textContent = val;
+    revealedKeys[keyId] = true;
+    setTimeout(() => {
+      if (revealedKeys[keyId]) {
+        el.textContent = maskKey(val);
+        revealedKeys[keyId] = false;
+      }
+    }, 10000);
+  }
+}
+
+function copyKey(keyId) {
+  const val = getApiKey(keyId);
+  if (!val) return;
+  navigator.clipboard.writeText(val).then(() => {
+    addLogEntry('Copied ' + keyId + ' to clipboard', 'info');
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = val;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    addLogEntry('Copied ' + keyId + ' to clipboard', 'info');
+  });
+}
+
+async function executeDrilldownAction(serviceId, actionIndex) {
+  const svc = SERVICES.find(s => s.id === serviceId);
+  const action = svc.actions[actionIndex];
+  const btn = document.getElementById(`dd-action-${serviceId}-${actionIndex}`);
+  if (!btn) return;
+  btn.disabled = true;
+  btn.classList.add('running');
+  btn.textContent = 'Running...';
+  await executeAction(serviceId, actionIndex);
+  btn.disabled = false;
+  btn.classList.remove('running');
+  btn.textContent = action.label;
 }
 
 // ===== BOOT =====
