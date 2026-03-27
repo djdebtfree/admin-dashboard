@@ -1151,7 +1151,6 @@ let serviceStates = {};
 let autoRefreshEnabled = true;
 let autoRefreshTimer = null;
 let logEntries = [];
-let healthHistory = {}; // { serviceId: [{ time, status, statusCode, responseTime, error }, ...] }
 
 // ===== INIT =====
 async function init() {
@@ -1601,19 +1600,6 @@ async function refreshAll() {
 
 function updateServiceStatus(id, state) {
   serviceStates[id] = { ...(serviceStates[id] || {}), ...state };
-  // Record to health history if this is a completed check (not just 'checking')
-  if (state.status && state.status !== 'checking') {
-    if (!healthHistory[id]) healthHistory[id] = [];
-    healthHistory[id].unshift({
-      time: new Date().toISOString(),
-      status: state.status,
-      statusCode: state.statusCode || null,
-      responseTime: state.responseTime || null,
-      error: state.error || null
-    });
-    if (healthHistory[id].length > 20) healthHistory[id] = healthHistory[id].slice(0, 20);
-    saveHealthHistory();
-  }
 }
 
 function updateMasterStatus() {
